@@ -1,0 +1,1 @@
+document.querySelectorAll('[data-heat-detail]').forEach(cell=>{const show=()=>{document.getElementById('heatmap-detail').textContent=cell.dataset.heatDetail;};cell.addEventListener('focus',show);cell.addEventListener('pointerenter',show);cell.addEventListener('click',show);});

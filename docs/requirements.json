@@ -1,0 +1,464 @@
+[
+  {
+    "id": "FR-001",
+    "requirement": "The system shall allow a user to register or be created with a defined account role (provider, recipient, recovery partner or administrator). For the demonstration, administrator-created accounts are acceptable.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-002",
+    "requirement": "The system shall allow registered users to sign in and sign out.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-003",
+    "requirement": "The system shall restrict screens and actions according to the user's role, enforced on the server.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-004",
+    "requirement": "The system shall allow an administrator to review and update organisation verification status.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-005",
+    "requirement": "The system should allow users to update basic profile information.",
+    "priority": "Should",
+    "release": "Post-demo"
+  },
+  {
+    "id": "FR-038",
+    "requirement": "The system shall require provider organisations to be verified by an administrator before their listings become visible to others.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-048",
+    "requirement": "The system should allow an administrator to reset a user's password.",
+    "priority": "Should",
+    "release": "Post-demo"
+  },
+  {
+    "id": "FR-006",
+    "requirement": "The system shall allow a verified provider to create a surplus-food listing.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-007",
+    "requirement": "Each listing shall capture food name or type, quantity, unit, area/location, condition, collection deadline, a single recovery pathway, and listing type.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-008",
+    "requirement": "The system shall allow a provider to edit a listing while it is in an editable status (Available with no accepted requests).",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-009",
+    "requirement": "The system shall allow a provider to mark a listing as withdrawn.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-010",
+    "requirement": "The system shall display listing status, creation time and collection deadline.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-011",
+    "requirement": "The system should allow a short description and handling or storage notes.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-039",
+    "requirement": "The listing type shall default to Donation (free). Other types (for example reduced price arranged outside the platform) are reserved for future use.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-040",
+    "requirement": "The system shall require the provider to tick a safety acknowledgement (Section 11) before a listing is published.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-045",
+    "requirement": "The system could allow one optional photo per listing, compressed for low- bandwidth use.",
+    "priority": "Could",
+    "release": "Post-demo"
+  },
+  {
+    "id": "FR-012",
+    "requirement": "The system shall display available listings to authorised users.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-013",
+    "requirement": "The system shall display key listing details before a recipient submits a request.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-014",
+    "requirement": "The system should allow filtering by recovery pathway, area, food type and availability.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-015",
+    "requirement": "The system shall prevent requests on listings that are withdrawn, expired, removed, fully allocated or otherwise unavailable.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-041",
+    "requirement": "Before a request is accepted, listings shall show only the general area. The exact pickup address and contact details shall be shown only to the provider and, after acceptance, to the accepted recipient.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-016",
+    "requirement": "The system shall identify potentially suitable listings using location, quantity, urgency, condition and intended-use suitability (scoring method in 4.4.1).",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-017",
+    "requirement": "The system shall never recommend a listing for human consumption when it is marked unsuitable for human consumption.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-018",
+    "requirement": "The system should show the reasons a listing matched (for example, 'Same area, 6 hours left').",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-019",
+    "requirement": "The system shall rank listings nearer their collection deadline higher when other conditions are equal.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-047",
+    "requirement": "The listing form shall explain the recovery hierarchy (people first, then animals, then compost) and prompt the provider to choose the highest suitable pathway.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-020",
+    "requirement": "A verified recipient or recovery partner shall be able to request an available listing for its approved pathway.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-021",
+    "requirement": "The system shall record the requesting organisation, listing, requested quantity and request date/time.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-022",
+    "requirement": "The provider shall be able to accept or decline a request.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-023",
+    "requirement": "Quantity is reserved only when a request is accepted. The system shall prevent accepted allocations from exceeding the available quantity.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-024",
+    "requirement": "The system shall display current request status to the relevant users.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-042",
+    "requirement": "The system should automatically expire Pending requests that are not decided within a configured period or before the listing deadline.",
+    "priority": "Should",
+    "release": "Post-demo"
+  },
+  {
+    "id": "FR-052",
+    "requirement": "The system shall require the requester to tick a safety acknowledgement (Section 11) before submitting a request.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-025",
+    "requirement": "The system shall allow relevant users to move a confirmed request through the defined collection statuses.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-026",
+    "requirement": "Supported statuses: Pending, Accepted, Ready for Collection, Collected, Declined, Cancelled, Expired and No-show.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-027",
+    "requirement": "The system shall record the date and time of each status change.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-028",
+    "requirement": "A request becomes Collected only when the provider records the confirmed quantity and the recipient confirms receipt. Collection notes may be added.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-049",
+    "requirement": "The system should mark an uncollected Ready request as No-show after the deadline and release its quantity.",
+    "priority": "Should",
+    "release": "Post-demo"
+  },
+  {
+    "id": "FR-029",
+    "requirement": "The dashboard shall show the total quantity listed in the selected period.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-030",
+    "requirement": "The dashboard shall show the total quantity confirmed as collected.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-031",
+    "requirement": "The dashboard shall show the quantity diverted through each recovery pathway.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-032",
+    "requirement": "The system shall distinguish listed from collected quantities so uncollected food is never counted as recovered.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-033",
+    "requirement": "The system should allow filtering of impact summaries by date range and pathway.",
+    "priority": "Should",
+    "release": "Post-demo"
+  },
+  {
+    "id": "FR-046",
+    "requirement": "The dashboard shall show kilograms diverted from disposal and estimated meals provided, using a documented, configurable assumption (default 0.4 kg per meal).",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-050",
+    "requirement": "The dashboard could show estimated CO2e avoided, using a documented emission factor with its source stated.",
+    "priority": "Could",
+    "release": "Post-demo"
+  },
+  {
+    "id": "FR-034",
+    "requirement": "The administrator shall be able to view accounts and verification status.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-035",
+    "requirement": "The administrator shall be able to approve, reject or suspend organisation access.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-036",
+    "requirement": "The administrator shall be able to review and remove listings that violate platform rules.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-037",
+    "requirement": "The system shall maintain an audit record of verification, suspension and removal actions, showing who acted, what changed and when.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-043",
+    "requirement": "Recipients shall be able to flag a listing (for example misdescribed or unsafe). Flags appear in an administrator review queue.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-044",
+    "requirement": "The system should show in-app notifications and an unread count for new requests, decisions, ready-for-collection updates and expiring listings.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "FR-051",
+    "requirement": "The system could send email notifications for the same events.",
+    "priority": "Could",
+    "release": "Post-demo"
+  },
+  {
+    "id": "NFR-001",
+    "requirement": "In a usability check, a first-time user shall be able to complete the main task for their role from the dashboard (for example, a provider creating a listing) within 3 minutes without assistance.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-002",
+    "requirement": "Forms shall use clear labels, safe defaults and validation messages that explain how to correct errors.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-003",
+    "requirement": "The system shall use consistent terminology for food condition, recovery pathway and listing and request status.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-004",
+    "requirement": "For the demonstration dataset and normal network conditions, common pages should load within 3 seconds.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-005",
+    "requirement": "Search and filtering should return results within 3 seconds.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-019",
+    "requirement": "Pages should stay lightweight for users on limited mobile data: no unnecessary large scripts, and uploaded images compressed.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-006",
+    "requirement": "The system shall require authentication for protected functions.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-007",
+    "requirement": "Role-based access control shall be enforced on the server, not only by hiding interface elements.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-008",
+    "requirement": "Passwords shall be stored using a recognised secure password-hashing mechanism.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-009",
+    "requirement": "The system shall validate input and protect against common web vulnerabilities (including injection, cross-site scripting and cross-site request forgery).",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-010",
+    "requirement": "Users shall access only the personal and operational information necessary for their role.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-022",
+    "requirement": "Collection and handling of personal data shall follow Zambia's Data Protection Act, 2021 principles: collect only what is needed, state the purpose, limit access, and protect it (Section 7.4).",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-024",
+    "requirement": "The hosted system shall use HTTPS, secure session cookies and automatic session expiry.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-011",
+    "requirement": "Listing and request records shall persist across page navigation and sign-out.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-012",
+    "requirement": "The system shall validate quantities and reject negative or zero values.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-013",
+    "requirement": "The system shall prevent over-allocation of a listing through concurrent or repeated requests, using database transactions and locking.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-020",
+    "requirement": "All timestamps shall be stored in UTC and displayed in CAT (UTC+2). Deadlines shall be evaluated consistently.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-023",
+    "requirement": "Audit records shall not be editable or deletable through the application interface.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-014",
+    "requirement": "The MVP shall be deployable in a documented demonstration environment.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-015",
+    "requirement": "The application shall use a modular structure that allows future addition of messaging, maps, payments or other integrations.",
+    "priority": "Should",
+    "release": "Post-demo"
+  },
+  {
+    "id": "NFR-016",
+    "requirement": "Errors shall be handled without exposing passwords, secret keys or stack traces to end users.",
+    "priority": "Must",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-021",
+    "requirement": "A documented procedure shall allow the application to run on a local machine, with demo data loaded, if internet access fails.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-025",
+    "requirement": "A database backup or export of the demonstration data shall be taken before the demonstration.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-017",
+    "requirement": "The application should support current versions of commonly used browsers.",
+    "priority": "Should",
+    "release": "Demo"
+  },
+  {
+    "id": "NFR-018",
+    "requirement": "Text, controls and status indicators shall remain readable and usable on mobile-sized screens, with sufficient colour contrast.",
+    "priority": "Must",
+    "release": "Demo"
+  }
+]

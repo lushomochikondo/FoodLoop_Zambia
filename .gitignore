@@ -1,0 +1,27 @@
+.venv/
+__pycache__/
+*.pyc
+*.sqlite3
+.env
+local-secret.txt
+media/
+backups/
+qa/*.png
+qa/responsive-results.json
+staticfiles/
+.env.*
+!.env.example
+dist/
+.tools/
+qa/demo-recording/
+qa/*-results.json
+qa/axe.min.js
+.gmail-env-*
+gmail_setup.status.json
+.email-worker.pid
+logs/
+qa/prototype-recording/
+
+# Unused generated icon explorations
+static/icons/3d/
+assets/generated-icons/

@@ -1,0 +1,8 @@
+{% load static %}
+<a class="nav-item {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-exchange"/></svg></span>Food exchange</a>
+<a class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}" href="{% url 'dashboard' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-analytics"/></svg></span>Dashboard</a>
+<a class="nav-item {% if request.path == '/requests/' %}active{% endif %}" href="{% url 'collections' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-collections"/></svg></span>Requests & collections</a>
+<a class="nav-item {% if request.path == '/impact/' %}active{% endif %}" href="{% url 'impact' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-recovery"/></svg></span>Recovery reports</a>
+<a class="nav-item {% if request.path == '/notifications/' %}active{% endif %}" href="{% url 'notifications' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-notifications"/></svg></span>Notifications{% if unread_count %}<span class="notification-count">{{ unread_count }}</span>{% endif %}</a>
+{% if user.is_staff %}<a class="nav-item {% if request.path == '/administration/' %}active{% endif %}" href="{% url 'moderation' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-verification"/></svg></span>Administration</a>{% endif %}
+<a class="nav-item {% if request.path == '/profile/' %}active{% endif %}" href="{% url 'profile' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-profile"/></svg></span>Account settings</a>

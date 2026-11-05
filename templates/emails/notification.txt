@@ -1,0 +1,10 @@
+FOODLOOP ZAMBIA
+
+Hi {{ name }},
+
+{{ message }}
+
+{% if url %}View this update: {{ url }}{% else %}Sign in to your FoodLoop workspace to view the update.{% endif %}
+
+Food worth sharing. A future worth growing.
+{% if preferences_url %}Manage email updates: {{ preferences_url }}{% else %}Manage email updates under Your profile in FoodLoop.{% endif %}
