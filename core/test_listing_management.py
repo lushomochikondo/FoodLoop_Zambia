@@ -1,3 +1,4 @@
+from .test_support import transition_request
 from datetime import timedelta
 from decimal import Decimal
 from tempfile import TemporaryDirectory
@@ -56,7 +57,7 @@ class ListingManagementTests(TestCase):
 
     def test_completed_collection_impact_and_history_survive_deletion(self):
         req=request_food(self.recipient,self.listing.pk,Decimal('4'),True)
-        for user,action in [(self.provider,'accept'),(self.provider,'ready'),(self.provider,'confirm'),(self.recipient,'confirm')]:change_request(user,req.pk,action)
+        for user,action in [(self.provider,'accept'),(self.provider,'ready'),(self.provider,'confirm'),(self.recipient,'confirm')]:transition_request(user,req,action)
         delete_listing(self.provider,self.listing.pk)
         req.refresh_from_db();self.assertEqual(req.status,'collected')
         self.client.force_login(self.provider)

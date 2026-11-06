@@ -1,3 +1,4 @@
+from .test_support import transition_request
 import subprocess
 import sys
 from datetime import timedelta
@@ -17,7 +18,7 @@ from django.core.management import call_command
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
-from .models import AuditLog, FoodRequest, Listing, Membership, Notification, Organisation
+from .models import AuditLog, BeneficiaryApplication, FoodRequest, Listing, Membership, Notification, Organisation
 from .services import change_request, request_food, verify_organisation
 from .tests import WorkflowTests
 
@@ -42,6 +43,7 @@ class AcceptanceTests(TestCase):
         admin = User.objects.create_user('administrator', is_staff=True)
         with self.assertRaises(ValidationError): verify_organisation(admin, org.pk, 'approved', 'Reviewed')
         org.physical_address = 'Fictional centre'; org.contact_name = 'Demo contact'; org.contact_email = 'demo@example.invalid'; org.phone = 'DEMO'; org.activity_description = 'Community kitchen'; org.handling_capacity = 'Demo cool storage'; org.terms_accepted = True; org.save()
+        BeneficiaryApplication.objects.create(organisation=org, legal_form='community', programme_type='community_kitchen', people_served=35, feeding_days_per_week=3, health_clearance='not_required', health_clearance_note='Community group uses a partner venue', food_handler_evidence='yes', food_handler_note='', storage_description='Covered containers and cool storage', beneficiary_records=True, no_resale_agreement=True, nondiscrimination_agreement=True, inspection_consent=True, information_accuracy=True, submitted_at=timezone.now())
         self.client.force_login(admin)
         response = self.client.post('/administration/', {'kind': 'organisation', 'record_id': org.pk, 'decision': 'approved', 'reason': 'Demo evidence reviewed'})
         self.assertEqual(response.status_code, 302)
@@ -121,9 +123,9 @@ class AcceptanceTests(TestCase):
         self.assertContains(self.client.get(f'/listings/{self.listing.pk}/'), 'PRIVATE-CONTACT')
         with self.assertRaises(ValidationError): change_request(self.recipient, req.pk, 'ready')
         change_request(self.provider, req.pk, 'ready')
-        change_request(self.provider, req.pk, 'confirm')
+        transition_request(self.provider, req, 'confirm')
         self.assertEqual(self.client.get('/').context['kg'], 0)
-        change_request(self.recipient, req.pk, 'confirm')
+        transition_request(self.recipient, req, 'confirm')
         req.refresh_from_db()
         self.assertIsNotNone(req.collected_at)
         self.assertEqual(self.client.get('/').context['kg'], 2)
@@ -149,7 +151,7 @@ class AcceptanceTests(TestCase):
 
     def test_collection_notes_preserve_collection_period(self):
         req = request_food(self.recipient, self.listing.pk, Decimal('2'), True)
-        for user, action in [(self.provider,'accept'), (self.provider,'ready'), (self.provider,'confirm'), (self.recipient,'confirm')]: change_request(user, req.pk, action)
+        for user, action in [(self.provider,'accept'), (self.provider,'ready'), (self.provider,'confirm'), (self.recipient,'confirm')]: transition_request(user, req, action)
         req.refresh_from_db(); timestamp = req.collected_at
         self.client.force_login(self.other)
         self.assertEqual(self.client.post(f'/requests/{req.pk}/notes/', {'notes': 'Not mine'}).status_code, 403)

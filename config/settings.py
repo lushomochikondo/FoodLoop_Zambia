@@ -1,4 +1,5 @@
 import os
+from email.utils import parseaddr
 import secrets
 from pathlib import Path
 from dotenv import load_dotenv
@@ -53,12 +54,24 @@ SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 REQUEST_EXPIRY_HOURS = int(os.environ.get('REQUEST_EXPIRY_HOURS', '24'))
 MEAL_WEIGHT_KG = os.environ.get('MEAL_WEIGHT_KG', '0.4')
-MATCH_WEIGHTS = {'location': 30, 'urgency': 30, 'quantity': 20, 'condition': 20}
+MATCH_WEIGHTS = {'location': int(os.environ.get('MATCH_WEIGHT_LOCATION', '30')), 'urgency': int(os.environ.get('MATCH_WEIGHT_URGENCY', '30')), 'quantity': int(os.environ.get('MATCH_WEIGHT_QUANTITY', '20')), 'condition': int(os.environ.get('MATCH_WEIGHT_CONDITION', '20'))}
 NEARBY_AREAS = {'Lusaka Central': ['Longacres', 'Rhodes Park'], 'Longacres': ['Lusaka Central', 'Rhodes Park'], 'Rhodes Park': ['Lusaka Central', 'Longacres']}
 TEMPLATES[0]['OPTIONS']['context_processors'].append('core.context_processors.workspace')
 CO2E_KG_PER_KG = os.environ.get('CO2E_KG_PER_KG', '')
 CO2E_SOURCE = os.environ.get('CO2E_SOURCE', '')
+REOFFER_GROUP_SIZE = int(os.environ.get('REOFFER_GROUP_SIZE', '5'))
+REOFFER_HALF_TIME_FRACTION = os.environ.get('REOFFER_HALF_TIME_FRACTION', '0.5')
+HANDOVER_CODE_ATTEMPTS = int(os.environ.get('HANDOVER_CODE_ATTEMPTS', '5'))
+LITRE_TO_KG_FACTOR = os.environ.get('LITRE_TO_KG_FACTOR', '1')
+WEIGHT_SANITY_LIMIT_KG = os.environ.get('WEIGHT_SANITY_LIMIT_KG', '100000')
+IMPACT_VALUE_PER_KG_HUMAN = os.environ.get('IMPACT_VALUE_PER_KG_HUMAN', '')
+IMPACT_VALUE_PER_KG_FEED = os.environ.get('IMPACT_VALUE_PER_KG_FEED', '')
+IMPACT_VALUE_PER_KG_COMPOST = os.environ.get('IMPACT_VALUE_PER_KG_COMPOST', '')
 EMAIL_NOTIFICATIONS_ENABLED = os.environ.get('EMAIL_NOTIFICATIONS_ENABLED', '0') == '1'
+WEB_PUSH_PUBLIC_KEY = os.environ.get('WEB_PUSH_PUBLIC_KEY', '')
+WEB_PUSH_PRIVATE_KEY = os.environ.get('WEB_PUSH_PRIVATE_KEY', '')
+WEB_PUSH_SUBJECT = os.environ.get('WEB_PUSH_SUBJECT', '')
+WEB_PUSH_ENABLED = bool(WEB_PUSH_PUBLIC_KEY and WEB_PUSH_PRIVATE_KEY)
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
@@ -68,6 +81,8 @@ EMAIL_TIMEOUT = 15
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'foodloop@example.invalid')
+if not WEB_PUSH_SUBJECT:
+    WEB_PUSH_SUBJECT = 'mailto:' + (parseaddr(DEFAULT_FROM_EMAIL)[1] or 'admin@foodloop.example')
 PUBLIC_APP_URL = os.environ.get('PUBLIC_APP_URL', '').rstrip('/')
 if not DEBUG:
     if not os.environ.get('DJANGO_SECRET_KEY'):

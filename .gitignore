@@ -14,6 +14,7 @@ staticfiles/
 dist/
 .tools/
 qa/demo-recording/
+qa/edge-eligibility-profile/
 qa/*-results.json
 qa/axe.min.js
 .gmail-env-*
@@ -25,3 +26,5 @@ qa/prototype-recording/
 # Unused generated icon explorations
 static/icons/3d/
 assets/generated-icons/
+
+private_uploads/

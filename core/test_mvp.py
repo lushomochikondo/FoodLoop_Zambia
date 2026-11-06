@@ -1,3 +1,4 @@
+from .test_support import transition_request
 from datetime import timedelta
 from decimal import Decimal
 from django.contrib.auth.models import User
@@ -118,10 +119,10 @@ class MVPTests(TestCase):
         change_request(self.provider, req.pk, 'accept')
         req.refresh_from_db(); self.assertIsNotNone(req.decision_time)
         change_request(self.provider, req.pk, 'ready')
-        change_request(self.provider, req.pk, 'confirm')
+        transition_request(self.provider, req, 'confirm')
         self.client.force_login(self.recipient)
         self.assertContains(self.client.get('/impact/'), '0.0')
-        change_request(self.recipient, req.pk, 'confirm')
+        transition_request(self.recipient, req, 'confirm')
         req.refresh_from_db(); self.assertEqual(req.confirmed_quantity, 4)
         self.assertEqual(req.events.count(), 5)
         self.assertTrue(all(e.created for e in req.events.all()))
@@ -135,7 +136,7 @@ class MVPTests(TestCase):
         self.client.force_login(self.recipient)
         self.assertEqual(self.client.get('/administration/').status_code, 403)
         req = request_food(self.recipient, self.listing.pk, Decimal('4'), True)
-        for user, action in [(self.provider, 'accept'), (self.provider, 'ready'), (self.provider, 'confirm'), (self.recipient, 'confirm')]: change_request(user, req.pk, action)
+        for user, action in [(self.provider, 'accept'), (self.provider, 'ready'), (self.provider, 'confirm'), (self.recipient, 'confirm')]: transition_request(user, req, action)
         self.listing.name = '=FORMULA'; self.listing.save()
         export = self.client.get('/impact/?format=csv')
         self.assertIn("'=FORMULA", export.content.decode())

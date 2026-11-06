@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Beneficiary eligibility · FoodLoop Zambia{% endblock %}
+{% block content %}
+<div class="beneficiary-eligibility-page">
+  <header class="eligibility-heading">
+    <p class="eyebrow">BENEFICIARY APPLICATION</p>
+    <h1>Before you apply.</h1>
+    <p>FoodLoop supports organisations serving people through these programmes. Review the eligibility and participation rules, choose your programme type, and accept them to continue to the application.</p>
+  </header>
+
+  <section class="eligibility-panel" aria-labelledby="eligible-programmes-title">
+    <p class="section-number">WHO CAN APPLY</p>
+    <h2 id="eligible-programmes-title">Supported organisation types</h2>
+    <div class="eligibility-category-grid">
+      {% for value, label in form.fields.programme_type.choices %}{% if value %}<article><span aria-hidden="true">✓</span><span>{{ label }}</span></article>{% endif %}{% endfor %}
+    </div>
+    <p class="eligibility-note">Schools may apply. Tell us about any current government or partner feeding support so we can consider unmet needs and avoid duplicating support. FoodLoop does not exclude an organisation solely because it receives public support.</p>
+  </section>
+
+  <section class="eligibility-panel" aria-labelledby="participation-title">
+    <p class="section-number">FOODLOOP PARTICIPATION RULES</p>
+    <h2 id="participation-title">What your organisation agrees to</h2>
+    <ul class="eligibility-rules">
+      <li>Use collected food for the programme and recovery pathway described in your application.</li>
+      <li>Do not sell, exchange or barter food received through FoodLoop, or pass it to another organisation without FoodLoop’s written approval.</li>
+      <li>Request only what your organisation can collect, handle and store safely. Inspect food at collection; FoodLoop does not certify food as safe.</li>
+      <li>Distribute food fairly and without discrimination, and keep basic records of collections and how food is used.</li>
+      <li>Give accurate information and cooperate with reasonable application checks and follow-up verification.</li>
+    </ul>
+    <p class="eligibility-note">Approval and food availability are not guaranteed. Applications are reviewed against community need, safe handling capacity, programme fit and available surplus. There is no minimum beneficiary count or minimum operating history.</p>
+  </section>
+
+  <section class="eligibility-panel eligibility-evidence" aria-labelledby="evidence-title">
+    <p class="section-number">WHAT TO PREPARE</p>
+    <h2 id="evidence-title">Evidence depends on your organisation</h2>
+    <p>Be ready to describe your programme, the people it serves, your leadership or sponsoring body, and how food will be collected, stored and distributed. You may provide the registration or recognition document that applies to your organisation. Relevant documents can include an NGO or society certificate, school or institution authorization, or a health-facility licence. Community programmes without a formal certificate can explain their structure and provide a suitable local reference.</p>
+    <p>If your premises prepare, store or handle food, provide any local-authority food-safety clearance that applies to those activities. If a requirement does not apply or is still pending, explain that in the application; do not upload unrelated documents.</p>
+    <p class="eligibility-note">Document requirements depend on your organisation’s type and activities. If you are unsure what applies, explain your situation in the application and FoodLoop will guide you during review.</p>
+  </section>
+
+  <details class="eligibility-sources">
+    <summary>Zambian laws and official guidance</summary>
+    <ul>
+      <li><a href="https://www.mcdss.gov.zm/?wpfb_dl=160" target="_blank" rel="noopener">MCDSS NGO standards and registration guidance</a> — NGO registration, governance and records.</li>
+      <li><a href="https://www.mohais.gov.zm/?page_id=1615" target="_blank" rel="noopener">Ministry of Home Affairs: Registrar of Societies</a> — society registration information.</li>
+      <li><a href="https://www.parliament.gov.zm/sites/default/files/documents/acts/The%20Food%20Safety%20%20Act%20No.%207%2C%202019.pdf" target="_blank" rel="noopener">Food Safety Act No. 7 of 2019</a> — food-premises compliance is handled by the relevant local authority.</li>
+      <li><a href="https://pbo.parliament.gov.zm/node/10343" target="_blank" rel="noopener">Children’s Code Act No. 12 of 2022</a> — child care, protection and safeguarding.</li>
+      <li><a href="https://www.parliament.gov.zm/sites/default/files/documents/acts/The%20Persons%20with%20disabilities%20act%2C%202012.PDF" target="_blank" rel="noopener">Persons with Disabilities Act No. 6 of 2012</a> — registration and regulation for relevant disability institutions and organisations.</li>
+      <li><a href="https://www.edu.gov.zm/?p=6666" target="_blank" rel="noopener">Ministry of Education: school feeding programme</a> — current programme context for school applicants.</li>
+    </ul>
+  </details>
+
+  <form method="post" class="eligibility-continue-form">
+    {% csrf_token %}
+    {% if form.errors %}<div class="message" role="alert">Choose your organisation type and accept the participation rules to continue.</div>{% endif %}
+    <div class="field">
+      <label for="{{ form.programme_type.id_for_label }}">{{ form.programme_type.label }}</label>
+      {{ form.programme_type }}{{ form.programme_type.errors }}
+    </div>
+    <label class="eligibility-accept">{{ form.accepted }}<span>{{ form.accepted.label }}</span></label>
+    {{ form.accepted.errors }}
+    <button type="submit">Accept and continue to application</button>
+    <p>By continuing, you confirm that you are authorised to apply for this organisation. Read our <a href="{% url 'privacy' %}" target="_blank" rel="noopener">privacy notice</a>.</p>
+  </form>
+</div>
+{% endblock %}

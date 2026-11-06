@@ -1,3 +1,4 @@
+from .test_support import transition_request
 from datetime import timedelta
 from decimal import Decimal
 from django.contrib.auth.models import User
@@ -69,7 +70,7 @@ class WorkspaceTests(TestCase):
         from .services import change_request
         req=request_food(self.recipient,self.listing.pk,Decimal('2'),True)
         for actor,action in [(self.provider,'accept'),(self.provider,'ready'),(self.provider,'confirm'),(self.recipient,'confirm')]:
-            change_request(actor,req.pk,action)
+            transition_request(actor,req,action)
         self.client.force_login(self.provider)
         response=self.client.get('/dashboard/')
         self.assertEqual(response.context['heatmap_total'],1)

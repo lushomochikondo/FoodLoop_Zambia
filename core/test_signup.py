@@ -1,7 +1,7 @@
 from unittest.mock import patch
 from django.contrib.auth.models import User
 from django.test import Client, TestCase, override_settings
-from .models import AuditLog, Membership, Notification, Organisation
+from .models import AuditLog, BeneficiaryApplication, Membership, Notification, Organisation
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
 class SignupTests(TestCase):
@@ -32,6 +32,30 @@ class SignupTests(TestCase):
         self.assertEqual(int(self.client.session['_auth_user_id']),user.pk)
         self.assertEqual(self.client.get('/listings/new/').status_code,403)
 
+    def test_beneficiary_application_can_be_saved_and_submitted_for_review(self):
+        response=self.client.post('/signup/?type=recipient',self.data())
+        self.assertRedirects(response,'/beneficiary/application/')
+        org=Organisation.objects.get(name='New Demo Kitchen')
+        self.assertEqual(org.status,'draft')
+        application=BeneficiaryApplication.objects.get(organisation=org)
+        self.assertIsNone(application.submitted_at)
+        self.assertEqual(self.client.get('/beneficiary/application/').status_code,200)
+        response=self.client.post('/beneficiary/application/',{
+            'action':'submit','legal_form':'community','programme_type':'community_kitchen',
+            'people_served':'35','feeding_days_per_week':'3','years_operating':'1.5',
+            'health_clearance':'not_required','health_clearance_note':'We use a partner venue.',
+            'food_handler_evidence':'yes','food_handler_note':'','storage_description':'Covered containers and cool storage.',
+            'governance_description':'Community committee','community_references':'Ward office contact available.',
+            'beneficiary_records':'on','no_resale_agreement':'on','nondiscrimination_agreement':'on',
+            'inspection_consent':'on','information_accuracy':'on','has_food_transport':'on',
+            'has_performance_indicators':'on','has_financial_records':'on','staff_or_volunteers':'4',
+            'additional_context':'',
+        })
+        self.assertRedirects(response,'/beneficiary/application/')
+        org.refresh_from_db(); application.refresh_from_db()
+        self.assertEqual(org.status,'pending')
+        self.assertIsNotNone(application.submitted_at)
+
     def test_role_and_approval_escalation_inputs_are_ignored(self):
         self.client.post('/signup/',self.data(is_staff='on',is_superuser='on',status='approved',role='administrator',pathway='feed'))
         user=User.objects.get(username='newmember')
@@ -45,7 +69,7 @@ class SignupTests(TestCase):
 
     def test_provider_and_both_recovery_pathways(self):
         for kind,role,pathway in [('provider','provider','human'),('feed','recovery','feed'),('compost','recovery','compost')]:
-            self.client.post('/signup/',self.data(username=f'new{kind}',organisation_name=f'New {kind}',account_type=kind,authorised_representative='on'))
+            self.client.post('/signup/',self.data(username=f'new{kind}',email=f'{kind}@example.invalid',organisation_name=f'New {kind}',account_type=kind,authorised_representative='on'))
             org=User.objects.get(username=f'new{kind}').membership.organisation
             self.assertEqual((org.role,org.pathway,org.status),(role,pathway,'pending'))
             self.client.logout()

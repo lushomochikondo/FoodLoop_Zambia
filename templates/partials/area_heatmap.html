@@ -1,0 +1,12 @@
+<section class="area-impact-panel" aria-labelledby="area-impact-title">
+  <div class="panel-heading"><div><h2 id="area-impact-title">Recovery by area</h2><p>Named areas only. Values stay grouped by unit, so unlike units are not added together.</p></div></div>
+  <form method="get" class="area-measure-form">
+    {% if start %}<input type="hidden" name="start" value="{{ start }}">{% endif %}{% if end %}<input type="hidden" name="end" value="{{ end }}">{% endif %}{% if pathway %}<input type="hidden" name="pathway" value="{{ pathway }}">{% endif %}
+    <label for="area-measure">Shade areas by</label><select id="area-measure" name="measure"><option value="listed" {% if measure == 'listed' or area_measure == 'listed' %}selected{% endif %}>Listed</option><option value="collected" {% if measure == 'collected' or area_measure == 'collected' %}selected{% endif %}>Collected</option><option value="wasted" {% if measure == 'wasted' or area_measure == 'wasted' %}selected{% endif %}>Wasted</option></select><button>Update heat map</button>
+  </form>
+  <div class="area-heatmap measure-{{ measure|default:area_measure }}" aria-label="Area quantity heat map">
+    {% for row in area_rows %}<article class="area-heat level-{{ row.level }}"><strong>{{ row.area }}</strong><span>{{ row.unit }}</span><dl><div><dt>Listed</dt><dd>{{ row.listed|floatformat:2 }}</dd></div><div><dt>Collected</dt><dd>{{ row.collected|floatformat:2 }}</dd></div><div><dt>Wasted</dt><dd>{{ row.wasted|floatformat:2 }}</dd></div></dl></article>{% empty %}<p class="muted">No area quantities are available for this period.</p>{% endfor %}
+  </div>
+  <p class="area-heat-legend"><span>Less</span><i class="level-1"></i><i class="level-2"></i><i class="level-3"></i><i class="level-4"></i><i class="level-5"></i><span>More</span></p>
+  <div class="table-scroll" role="region" aria-label="Area quantities table" tabindex="0"><table><thead><tr><th>Area</th><th>Unit</th><th>Listed</th><th>Collected</th><th>Wasted</th></tr></thead><tbody>{% for row in area_rows %}<tr><th>{{ row.area }}</th><td>{{ row.unit }}</td><td>{{ row.listed|floatformat:2 }}</td><td>{{ row.collected|floatformat:2 }}</td><td>{{ row.wasted|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="5">No area quantities are available.</td></tr>{% endfor %}</tbody></table></div>
+</section>

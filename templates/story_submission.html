@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Submit a success story · FoodLoop Zambia{% endblock %}
+{% block content %}
+<div class="story-submit-page">
+  <header class="story-submit-heading">
+    <p class="eyebrow">SHARE A PARTNER STORY</p>
+    <h1>Tell us what your team has achieved.</h1>
+    <p>Send your story to FoodLoop for review. Our team will contact you if anything needs clarification, and publish it only after approval.</p>
+  </header>
+  <div class="story-submit-layout">
+    <form method="post" enctype="multipart/form-data" class="story-submit-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="story-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      {% for field in form %}
+        <div class="story-field {% if field.name == 'consent_confirmed' %}story-consent{% endif %}">
+          {% if field.name == 'consent_confirmed' %}<label>{{ field }} <span>{{ field.label }}</span></label>{% else %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% endif %}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {% if field.errors %}<div class="story-field-error" role="alert">{{ field.errors }}</div>{% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="story-submit-button">Send story for review</button>
+    </form>
+    <aside class="story-submit-guidance">
+      <p class="eyebrow">WHAT MAKES A GOOD STORY</p>
+      <h2>Keep it clear and grounded.</h2>
+      <ul><li>Explain the need or challenge.</li><li>Describe what your organisation and partners did.</li><li>Share a concrete result, with numbers only when you can verify them.</li><li>Get permission before sharing names, faces or other identifying details.</li></ul>
+      <p>Submitting a story does not publish it automatically. FoodLoop staff review every submission first.</p>
+    </aside>
+  </div>
+  <section class="story-submissions-list">
+    <div class="story-submissions-heading"><div><p class="eyebrow">YOUR SUBMISSIONS</p><h2>Story status</h2></div><span>{{ submissions|length }} submitted</span></div>
+    {% for item in submissions %}
+      <article class="story-submission-row"><div><h3>{{ item.title }}</h3><p>Sent {{ item.submitted_at|date:'d M Y' }}{% if item.status == 'published' and item.news_article %} · <a href="{% url 'news_detail' item.news_article.slug %}">View published story</a>{% endif %}</p>{% if item.review_note %}<p class="story-review-note">{{ item.review_note }}</p>{% endif %}</div><span class="story-status story-status-{{ item.status }}">{{ item.get_status_display }}</span></article>
+    {% empty %}<p class="story-no-submissions">You have not submitted a story yet.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

@@ -1,3 +1,4 @@
+from .test_support import transition_request
 from datetime import timedelta
 from decimal import Decimal
 from django.contrib.auth.models import User
@@ -31,9 +32,9 @@ class WorkflowTests(TestCase):
         change_request(self.provider, req.pk, 'accept')
         self.listing.refresh_from_db(); self.assertEqual(self.listing.remaining, 2)
         change_request(self.provider, req.pk, 'ready')
-        change_request(self.provider, req.pk, 'confirm')
+        transition_request(self.provider, req, 'confirm')
         req.refresh_from_db(); self.assertEqual(req.status, 'ready')
-        change_request(self.recipient, req.pk, 'confirm')
+        transition_request(self.recipient, req, 'confirm')
         req.refresh_from_db(); self.assertEqual(req.status, 'collected')
         with self.assertRaises(ValidationError): change_request(self.recipient, req.pk, 'cancel')
     def test_overallocation_and_release(self):
