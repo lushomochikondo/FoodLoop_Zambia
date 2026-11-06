@@ -15,6 +15,7 @@ urlpatterns += [
     path('drop-off-locations/',public_pages.drop_off_locations,name='drop_off_locations'),
     path('faq/',public_pages.faq,name='faq'),
     path('news/',public_pages.news,name='news'),
+    path('internal/run-jobs/', views.scheduled_jobs, name='scheduled_jobs'),
     path('news/submit-success-story/', views.submit_success_story, name='submit_success_story'),
     path('news/<slug:slug>/',public_pages.news_detail,name='news_detail'),
     path('contact/',public_pages.contact,name='contact'),

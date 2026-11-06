@@ -10,8 +10,11 @@ from .models import EmailPreferences
 from django.utils import timezone
 from datetime import timedelta
 
+UPLOAD_MAX_BYTES = 4 * 1024 * 1024
+UPLOAD_MAX_MB = 4
+
 class ListingForm(forms.ModelForm):
-    photo = forms.ImageField(required=False, label='Food photo', help_text='Upload a clear photo of the actual food. JPG, PNG or WebP, up to 8 MB.', widget=forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}))
+    photo = forms.ImageField(required=False, label='Food photo', help_text=f'Upload a clear photo of the actual food. JPG, PNG or WebP, up to {UPLOAD_MAX_MB} MB.', widget=forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}))
     pickup_latitude = forms.DecimalField(required=False, min_value=-90, max_value=90, max_digits=9, decimal_places=6, widget=forms.HiddenInput())
     pickup_longitude = forms.DecimalField(required=False, min_value=-180, max_value=180, max_digits=9, decimal_places=6, widget=forms.HiddenInput())
     def clean_photo(self):
@@ -20,8 +23,8 @@ class ListingForm(forms.ModelForm):
             return photo
         if not hasattr(photo, 'temporary_file_path') and photo == self.instance.photo and not self.files:
             return photo
-        if photo.size > 8 * 1024 * 1024:
-            raise forms.ValidationError('Choose a photo smaller than 8 MB.')
+        if photo.size > UPLOAD_MAX_BYTES:
+            raise forms.ValidationError(f'Choose a photo smaller than {UPLOAD_MAX_MB} MB.')
         try:
             with Image.open(photo) as source:
                 if source.format not in {'JPEG', 'PNG', 'WEBP'}:
@@ -222,14 +225,14 @@ class BeneficiaryApplicationForm(forms.ModelForm):
             for name in ('beneficiary_records', 'no_resale_agreement', 'nondiscrimination_agreement', 'inspection_consent', 'information_accuracy'):
                 self.fields[name].required = True
         for name in ('registration_document', 'health_document', 'supporting_document'):
-            self.fields[name].help_text = 'PDF, JPG or PNG, up to 8 MB. Files are visible only to you and FoodLoop administrators.'
+            self.fields[name].help_text = f'PDF, JPG or PNG, up to {UPLOAD_MAX_MB} MB. Files are visible only to you and FoodLoop administrators.'
 
     def clean(self):
         cleaned = super().clean()
         for name in ('registration_document', 'health_document', 'supporting_document'):
             file = cleaned.get(name)
-            if file and getattr(file, 'size', 0) > 8 * 1024 * 1024:
-                self.add_error(name, 'Choose a file smaller than 8 MB.')
+            if file and getattr(file, 'size', 0) > UPLOAD_MAX_BYTES:
+                self.add_error(name, f'Choose a file smaller than {UPLOAD_MAX_MB} MB.')
         if self.submitting:
             if cleaned.get('people_served') is not None and cleaned['people_served'] < 1:
                 self.add_error('people_served', 'Enter at least one person served.')
@@ -271,9 +274,9 @@ class StorySubmissionForm(forms.ModelForm):
             'image': forms.ClearableFileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}),
         }
         labels = {'title': 'Story title', 'summary': 'Short summary', 'body': 'Story', 'image': 'Photo (optional)'}
-        help_texts = {'image': 'Use a photo you have permission to share. JPG, PNG or WebP, up to 8 MB.'}
+        help_texts = {'image': f'Use a photo you have permission to share. JPG, PNG or WebP, up to {UPLOAD_MAX_MB} MB.'}
     def clean_image(self):
         image = self.cleaned_data.get('image')
-        if image and image.size > 8 * 1024 * 1024:
-            raise forms.ValidationError('Choose an image smaller than 8 MB.')
+        if image and image.size > UPLOAD_MAX_BYTES:
+            raise forms.ValidationError(f'Choose an image smaller than {UPLOAD_MAX_MB} MB.')
         return image

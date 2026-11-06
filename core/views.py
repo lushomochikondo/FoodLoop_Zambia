@@ -11,14 +11,17 @@ from django.db import IntegrityError
 from django.forms import HiddenInput
 from django.http import FileResponse, HttpResponse, JsonResponse
 import csv
+import hmac
 import json
 import math
+import os
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.http import HttpResponseNotFound
+from django.core.management import call_command
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 from .forms import BeneficiaryApplicationForm, BeneficiaryEligibilityForm, CollectionNotesForm, DecisionForm, FlagForm, ListingForm, PreferencesForm, ProfileForm, RequestForm
 from .forms import SignupForm, StorySubmissionForm
 from .models import AuditLog, BeneficiaryApplication, FlagReport, FoodRequest, Listing, Notification, Organisation, PATHWAYS, PlatformSetting, StorySubmission
@@ -298,6 +301,15 @@ def submit_success_story(request):
         return redirect('submit_success_story')
     submissions = StorySubmission.objects.filter(organisation=org).select_related('news_article')
     return render(request, 'story_submission.html', {'form': form, 'org': org, 'submissions': submissions})
+
+@require_GET
+def scheduled_jobs(request):
+    secret = os.environ.get('CRON_SECRET', '')
+    authorization = request.headers.get('Authorization', '')
+    if not secret or not hmac.compare_digest(authorization, f'Bearer {secret}'):
+        return HttpResponseNotFound()
+    call_command('run_jobs')
+    return JsonResponse({'ok': True})
 
 @login_required
 def collections(request):
