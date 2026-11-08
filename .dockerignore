@@ -9,6 +9,7 @@ __pycache__
 !.env.example
 local-secret.txt
 media
+private_uploads
 backups
 staticfiles
 qa

@@ -9,7 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env.local', override=False, interpolate=False)
 load_dotenv(BASE_DIR / '.env', override=False, interpolate=False)
 secret_file = BASE_DIR / 'local-secret.txt'
-DEBUG = os.environ.get('DJANGO_DEBUG', '0' if os.environ.get('VERCEL') == '1' else '1') == '1'
+RENDER = os.environ.get('RENDER') == 'true'
+DEBUG = os.environ.get('DJANGO_DEBUG', '0' if os.environ.get('VERCEL') == '1' or RENDER else '1') == '1'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
     if not DEBUG:
@@ -25,6 +26,8 @@ if os.environ.get('VERCEL') == '1':
     if os.environ.get('VERCEL_URL'):
         ALLOWED_HOSTS.append(os.environ['VERCEL_URL'].split(':', 1)[0])
 WSGI_APPLICATION = 'config.wsgi.application'
+if RENDER and os.environ.get('RENDER_EXTERNAL_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.environ['RENDER_EXTERNAL_HOSTNAME'])
 ASGI_APPLICATION = 'config.asgi.application'
 INSTALLED_APPS = ['django.contrib.admin', 'django.contrib.auth', 'django.contrib.contenttypes', 'django.contrib.sessions', 'django.contrib.messages', 'django.contrib.staticfiles', 'core']
 MIDDLEWARE = ['django.middleware.security.SecurityMiddleware', 'django.contrib.sessions.middleware.SessionMiddleware', 'django.middleware.common.CommonMiddleware', 'django.middleware.csrf.CsrfViewMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware', 'django.contrib.messages.middleware.MessageMiddleware', 'django.middleware.clickjacking.XFrameOptionsMiddleware']
@@ -57,6 +60,8 @@ elif os.environ.get('POSTGRES_DB'):
     DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql', 'NAME': os.environ['POSTGRES_DB'], 'USER': os.environ.get('POSTGRES_USER', ''), 'PASSWORD': os.environ.get('POSTGRES_PASSWORD', ''), 'HOST': os.environ.get('POSTGRES_HOST', 'localhost'), 'PORT': os.environ.get('POSTGRES_PORT', '5432'), 'CONN_MAX_AGE': 60, 'OPTIONS': {'sslmode': os.environ.get('POSTGRES_SSLMODE', 'require')}}}
 elif os.environ.get('VERCEL') == '1':
     raise RuntimeError('Set DATABASE_URL to a persistent PostgreSQL database before deploying FoodLoop to Vercel.')
+if RENDER and DATABASES['default']['ENGINE'] != 'django.db.backends.postgresql':
+    raise RuntimeError('Set DATABASE_URL to a persistent PostgreSQL database before deploying FoodLoop to Render.')
 AUTH_PASSWORD_VALIDATORS = [{'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'}, {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'}, {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'}]
 TIME_ZONE = 'Africa/Lusaka'
 USE_TZ = True
@@ -88,6 +93,8 @@ if OBJECT_STORAGE_BUCKET:
     }}
 if os.environ.get('VERCEL') == '1' and (not OBJECT_STORAGE_BUCKET or not PRIVATE_UPLOADS_BUCKET):
     raise RuntimeError('Set OBJECT_STORAGE_BUCKET and PRIVATE_UPLOADS_BUCKET to persistent buckets before deploying FoodLoop to Vercel.')
+if RENDER and (not OBJECT_STORAGE_BUCKET or not PRIVATE_UPLOADS_BUCKET):
+    raise RuntimeError('Set OBJECT_STORAGE_BUCKET and PRIVATE_UPLOADS_BUCKET before deploying FoodLoop to Render.')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -127,7 +134,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'foodloop@example.invalid')
 if not WEB_PUSH_SUBJECT:
     WEB_PUSH_SUBJECT = 'mailto:' + (parseaddr(DEFAULT_FROM_EMAIL)[1] or 'admin@foodloop.example')
-PUBLIC_APP_URL = os.environ.get('PUBLIC_APP_URL', '').rstrip('/')
+PUBLIC_APP_URL = os.environ.get('PUBLIC_APP_URL', os.environ.get('RENDER_EXTERNAL_URL', '')).rstrip('/')
 if not DEBUG:
     if not os.environ.get('DJANGO_SECRET_KEY'):
         raise RuntimeError('Set DJANGO_SECRET_KEY before running with DEBUG disabled.')
@@ -136,6 +143,8 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
+    if RENDER and os.environ.get('RENDER_EXTERNAL_HOSTNAME'):
+        CSRF_TRUSTED_ORIGINS.append('https://' + os.environ['RENDER_EXTERNAL_HOSTNAME'])
     if os.environ.get('VERCEL') == '1':
         CSRF_TRUSTED_ORIGINS.append('https://*.vercel.app')
         if os.environ.get('VERCEL_URL'):

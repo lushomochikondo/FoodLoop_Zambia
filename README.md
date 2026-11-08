@@ -1,5 +1,7 @@
 # FoodLoop Zambia
 
+For the hosted testing setup, see [Render deployment](docs/RENDER_DEPLOYMENT.md).
+
 Local Django MVP based on FLZ-SRS-001 version 1.1 (4 November 2026).
 
 ## Run locally (PowerShell)

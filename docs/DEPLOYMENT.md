@@ -12,7 +12,7 @@ Install Python 3.13, create `.venv`, install `requirements.txt`, run migrations,
 
 ## Hosting prerequisites
 
-Use a Python/Django-capable Linux host, managed PostgreSQL, persistent media storage and an HTTPS domain. Cloudflare Workers/Sites cannot directly run this standard Django process. Select the actual hosting account/platform before deployment; this project has not been provisioned with remote credentials or a domain.
+Use a Python/Django-capable Linux host, managed PostgreSQL, persistent media storage and an HTTPS domain. Cloudflare Python Workers support Django with runtime adaptations; this project's standard Gunicorn process is prepared for conventional Python hosting. See [Render testing deployment](RENDER_DEPLOYMENT.md) for the selected free testing configuration.
 
 Install `requirements-production.txt`. Set:
 
