@@ -122,11 +122,11 @@ def beneficiary_application(request):
             org.status = 'pending'
             org.save(update_fields=['status'])
             AuditLog.objects.create(actor=request.user, action=f'Beneficiary application for organisation {org.pk} submitted for review')
-            Notification.objects.create(user=request.user, message='Your beneficiary application has been submitted for review.')
+            Notification.objects.create(user=request.user, message='Your beneficiary application has been submitted for review. Review may take up to 72 hours.')
             for admin in User.objects.filter(is_staff=True, is_active=True):
                 Notification.objects.create(user=admin, message=f'Beneficiary application awaiting review: {org.name}'[:240])
             application.save()
-            messages.success(request, 'Your application has been submitted for review.')
+            messages.success(request, 'Your application has been submitted for review. Review may take up to 72 hours.')
         else:
             application.save()
             messages.success(request, 'Your application draft has been saved.' if org.status == 'draft' else 'Your changes are saved. Submit the updated application when ready.')
