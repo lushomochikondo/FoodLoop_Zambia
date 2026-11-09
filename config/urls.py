@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth
 from django.urls import path
+from core.authentication import UsernameOrEmailAuthenticationForm
 from core import views
 from core import public_pages
 from django.conf import settings
@@ -9,7 +10,7 @@ from django.http import FileResponse
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 
-urlpatterns = [path('requests/<int:pk>/notes/', views.collection_notes, name='collection_notes'), path('admin/', admin.site.urls), path('login/', auth.LoginView.as_view(template_name='login.html'), name='login'), path('logout/', auth.LogoutView.as_view(), name='logout'), path('password-reset/', auth.PasswordResetView.as_view(template_name='registration/password_reset_form.html', email_template_name='registration/password_reset_email.html', subject_template_name='registration/password_reset_subject.txt', success_url='/password-reset/done/'), name='password_reset'), path('password-reset/done/', auth.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name='password_reset_done'), path('reset/<uidb64>/<token>/', auth.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html', success_url='/reset/complete/'), name='password_reset_confirm'), path('reset/complete/', auth.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), name='password_reset_complete'), path('', views.home, name='home'), path('listings/new/', views.create_listing, name='create_listing'), path('listings/<int:pk>/', views.detail, name='detail'), path('requests/<int:pk>/<str:action>/', views.transition, name='transition')]
+urlpatterns = [path('requests/<int:pk>/notes/', views.collection_notes, name='collection_notes'), path('admin/', admin.site.urls), path('login/', auth.LoginView.as_view(template_name='login.html', authentication_form=UsernameOrEmailAuthenticationForm), name='login'), path('logout/', auth.LogoutView.as_view(), name='logout'), path('password-reset/', auth.PasswordResetView.as_view(template_name='registration/password_reset_form.html', email_template_name='registration/password_reset_email.html', subject_template_name='registration/password_reset_subject.txt', success_url='/password-reset/done/'), name='password_reset'), path('password-reset/done/', auth.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name='password_reset_done'), path('reset/<uidb64>/<token>/', auth.PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html', success_url='/reset/complete/'), name='password_reset_confirm'), path('reset/complete/', auth.PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), name='password_reset_complete'), path('', views.home, name='home'), path('listings/new/', views.create_listing, name='create_listing'), path('listings/<int:pk>/', views.detail, name='detail'), path('requests/<int:pk>/<str:action>/', views.transition, name='transition')]
 urlpatterns += [
     path('company/<slug:slug>/',public_pages.company_page,name='company_page'),
     path('drop-off-locations/',public_pages.drop_off_locations,name='drop_off_locations'),
