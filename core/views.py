@@ -88,9 +88,9 @@ def signup(request):
                 EmailPreferences.objects.create(user=user, enabled=form.cleaned_data['email_updates'])
                 AuditLog.objects.create(actor=user, action=f'Organisation {org.pk}: beneficiary application draft created' if application_draft else f'Organisation {org.pk}: self-registration submitted for verification')
                 Notification.objects.create(user=user, message='Your beneficiary application is saved as a draft.' if application_draft else 'Welcome to FoodLoop. Your organisation is awaiting administrator verification.')
-                if not application_draft:
-                    for admin in User.objects.filter(is_staff=True, is_active=True):
-                        Notification.objects.create(user=admin, message=f'New organisation awaiting verification: {org.name}'[:240])
+                for admin in User.objects.filter(is_staff=True, is_active=True):
+                    message = f'New beneficiary registration (assessment not yet submitted): {org.name}' if application_draft else f'New organisation awaiting verification: {org.name}'
+                    Notification.objects.create(user=admin, message=message[:240])
         except IntegrityError:
             form.add_error('username', 'This username was just registered. Choose another and try again.')
         else:
@@ -487,7 +487,7 @@ def moderation(request):
         except ValidationError as exc: messages.error(request, '; '.join(exc.messages))
         else: messages.success(request, 'Decision recorded in the audit trail.')
         return redirect('moderation')
-    return render(request, 'moderation.html', {'organisations': Organisation.objects.exclude(status='draft').order_by('status', 'name'), 'flags': FlagReport.objects.select_related('listing', 'reporter').filter(status='pending'), 'moderation_listings': Listing.objects.filter(status='available').select_related('provider'), 'audit': AuditLog.objects.select_related('actor').order_by('-created', '-pk')[:60], 'decision_form': form})
+    return render(request, 'moderation.html', {'beneficiary_drafts': Organisation.objects.filter(role='recipient', status='draft').order_by('-pk'), 'organisations': Organisation.objects.exclude(status='draft').order_by('status', 'name'), 'flags': FlagReport.objects.select_related('listing', 'reporter').filter(status='pending'), 'moderation_listings': Listing.objects.filter(status='available').select_related('provider'), 'audit': AuditLog.objects.select_related('actor').order_by('-created', '-pk')[:60], 'decision_form': form})
 
 def build_area_impact_rows(listings, collections, measure):
     units = Listing._meta.get_field('unit').choices

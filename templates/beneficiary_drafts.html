@@ -1,0 +1,12 @@
+<div class="section-heading"><h2>Beneficiary registrations not yet submitted</h2></div>
+<p>These organisations have created accounts but must complete and submit their beneficiary assessment before approval.</p>
+<div class="review-grid">
+{% for item in beneficiary_drafts %}
+<section class="review-card">
+  <span class="status">Application draft</span><h3>{{ item.name }}</h3>
+  <p>{{ item.area }} · {{ item.contact_name }} · {{ item.contact_email }}</p>
+  <p>Registered; awaiting submission from the beneficiary.</p>
+  <a href="{% url 'admin:core_organisation_change' item.pk %}">View registration details</a>
+</section>
+{% empty %}<p>No beneficiary registrations awaiting submission.</p>{% endfor %}
+</div>
