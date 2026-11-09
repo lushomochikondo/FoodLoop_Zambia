@@ -106,6 +106,7 @@ class NewsAdmin(admin.ModelAdmin):
 
 @admin.register(StorySubmission)
 class StorySubmissionAdmin(admin.ModelAdmin):
+    change_form_template = 'admin/core/storysubmission/change_form.html'
     list_display = ['title', 'organisation', 'submitted_by', 'submitted_at', 'status']
     list_filter = ['status', 'submitted_at']
     search_fields = ['title', 'summary', 'body', 'organisation__name', 'submitted_by__username']
@@ -113,10 +114,19 @@ class StorySubmissionAdmin(admin.ModelAdmin):
     readonly_fields = ['organisation', 'submitted_by', 'title', 'summary', 'body', 'image', 'consent_confirmed', 'submitted_at', 'status', 'reviewed_at', 'news_article']
     fields = ['organisation', 'submitted_by', 'title', 'summary', 'body', 'image', 'consent_confirmed', 'submitted_at', 'status', 'review_note', 'reviewed_at', 'news_article']
 
+    def response_change(self, request, obj):
+        queryset = StorySubmission.objects.filter(pk=obj.pk)
+        if '_publish_story' in request.POST:
+            self.publish_as_success_story(request, queryset)
+        elif '_decline_story' in request.POST:
+            self.decline_submissions(request, queryset)
+        return super().response_change(request, obj)
+
     @admin.action(description='Publish selected submissions as success stories')
+    @transaction.atomic
     def publish_as_success_story(self, request, queryset):
         published = 0
-        for submission in queryset.select_related('organisation', 'submitted_by'):
+        for submission in queryset.select_for_update().select_related('organisation', 'submitted_by'):
             if submission.status != 'pending':
                 continue
             slug = f"{slugify(submission.title)[:200].strip('-') or 'success-story'}-{submission.pk}"

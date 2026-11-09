@@ -1,0 +1,11 @@
+{% extends 'admin/change_form.html' %}
+{% block submit_buttons_bottom %}
+{% if change and has_change_permission and original.status == 'pending' %}
+<div class="submit-row">
+  <input type="submit" name="_publish_story" value="Publish success story" class="default">
+  <input type="submit" name="_decline_story" value="Decline story">
+  <p>Publishing makes this story and its attached image public. Your review note will be saved.</p>
+</div>
+{% endif %}
+{{ block.super }}
+{% endblock %}
