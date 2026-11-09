@@ -1,0 +1,7 @@
+/* The viewport starts below the browser/system chrome on phones and desktops. */
+.page-loading{position:fixed;inset:0 0 auto;height:3px;z-index:10000;overflow:hidden;pointer-events:none;background:#e1a91b33;opacity:0;visibility:hidden;transition:opacity .15s ease}
+.page-loading.is-active{opacity:1;visibility:visible}
+.page-loading::before{content:"";display:block;width:35%;height:100%;background:#e1a91b;transform:translateX(-100%)}
+.page-loading.is-active::before{animation:page-loading-slide 1.25s ease-in-out infinite}
+@keyframes page-loading-slide{to{transform:translateX(386%)}}
+@media(prefers-reduced-motion:reduce){.page-loading{transition:none}.page-loading.is-active::before{animation:none;width:100%;transform:none}}
