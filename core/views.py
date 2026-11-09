@@ -87,7 +87,7 @@ def signup(request):
                     )
                 EmailPreferences.objects.create(user=user, enabled=form.cleaned_data['email_updates'])
                 AuditLog.objects.create(actor=user, action=f'Organisation {org.pk}: beneficiary application draft created' if application_draft else f'Organisation {org.pk}: self-registration submitted for verification')
-                Notification.objects.create(user=user, message='Your beneficiary application is saved as a draft.' if application_draft else 'Welcome to FoodLoop. Your organisation is awaiting administrator verification.')
+                Notification.objects.create(user=user, message='Your beneficiary application is saved as a draft.' if application_draft else 'Welcome to FoodLoop. Your organisation is awaiting administrator verification. Review may take up to 72 hours.')
                 for admin in User.objects.filter(is_staff=True, is_active=True):
                     message = f'New beneficiary registration (assessment not yet submitted): {org.name}' if application_draft else f'New organisation awaiting verification: {org.name}'
                     Notification.objects.create(user=admin, message=message[:240])
@@ -99,7 +99,7 @@ def signup(request):
                 request.session.pop('beneficiary_eligibility', None)
                 messages.success(request, 'Account created. Your beneficiary application is saved as a draft. Complete it when you are ready to submit for review.')
                 return redirect('beneficiary_application')
-            messages.success(request, 'Account created. Your organisation is awaiting verification; you can list or request food once approved.')
+            messages.success(request, 'Account created. Your organisation is awaiting verification. Review may take up to 72 hours; you can list or request food once approved.')
             return redirect('home')
     return render(request, 'signup.html', {'form': form, 'signup_type': signup_type if signup_type in ('provider', 'recipient') else ''})
 
