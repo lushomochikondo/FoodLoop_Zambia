@@ -74,7 +74,7 @@ class SignupTests(TestCase):
         for kind,role,pathway in [('provider','provider','human'),('feed','recovery','feed'),('compost','recovery','compost')]:
             self.client.post('/signup/',self.data(username=f'new{kind}',email=f'{kind}@example.invalid',organisation_name=f'New {kind}',account_type=kind,authorised_representative='on'))
             org=User.objects.get(username=f'new{kind}').membership.organisation
-            self.assertEqual((org.role,org.pathway,org.status),(role,pathway,'pending'))
+            self.assertEqual((org.role,org.pathway,org.status),(role,pathway,'approved' if kind == 'provider' else 'pending'))
             self.client.logout()
 
     def test_password_terms_and_conditional_evidence_validation(self):

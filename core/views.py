@@ -76,7 +76,8 @@ def signup(request):
                 user.is_superuser = False
                 user.save()
                 application_draft = account_type == 'recipient'
-                org = Organisation.objects.create(name=form.cleaned_data['organisation_name'], role=account_type if account_type in ['provider', 'recipient'] else 'recovery', pathway=account_type if account_type in ['feed', 'compost'] else 'human', status='draft' if application_draft else 'pending', contact_name=form.cleaned_data['contact_name'], contact_email=form.cleaned_data['email'], phone=form.cleaned_data['phone'], area=form.cleaned_data['area'], physical_address=form.cleaned_data['physical_address'], registration_reference=form.cleaned_data['registration_reference'], activity_description=form.cleaned_data['activity_description'], handling_capacity=form.cleaned_data['handling_capacity'], authorised_representative=form.cleaned_data['authorised_representative'], terms_accepted=True)
+                immediate_donor = account_type == 'provider'
+                org = Organisation.objects.create(name=form.cleaned_data['organisation_name'], role=account_type if account_type in ['provider', 'recipient'] else 'recovery', pathway=account_type if account_type in ['feed', 'compost'] else 'human', status='draft' if application_draft else 'approved' if immediate_donor else 'pending', verification_reason='Donor posting enabled at registration; administrator approval is not required.' if immediate_donor else '', contact_name=form.cleaned_data['contact_name'], contact_email=form.cleaned_data['email'], phone=form.cleaned_data['phone'], area=form.cleaned_data['area'], physical_address=form.cleaned_data['physical_address'], registration_reference=form.cleaned_data['registration_reference'], activity_description=form.cleaned_data['activity_description'], handling_capacity=form.cleaned_data['handling_capacity'], authorised_representative=form.cleaned_data['authorised_representative'], terms_accepted=True)
                 Membership.objects.create(user=user, organisation=org)
                 if application_draft:
                     BeneficiaryApplication.objects.create(
@@ -86,10 +87,10 @@ def signup(request):
                         eligibility_accepted_at=parse_datetime(acceptance.get('accepted_at', '')) or timezone.now(),
                     )
                 EmailPreferences.objects.create(user=user, enabled=form.cleaned_data['email_updates'])
-                AuditLog.objects.create(actor=user, action=f'Organisation {org.pk}: beneficiary application draft created' if application_draft else f'Organisation {org.pk}: self-registration submitted for verification')
-                Notification.objects.create(user=user, message='Your beneficiary application is saved as a draft.' if application_draft else 'Welcome to FoodLoop. Your organisation is awaiting administrator verification. Review may take up to 72 hours.')
+                AuditLog.objects.create(actor=user, action=f'Organisation {org.pk}: beneficiary application draft created' if application_draft else f'Organisation {org.pk}: donor posting enabled at registration' if immediate_donor else f'Organisation {org.pk}: self-registration submitted for verification')
+                Notification.objects.create(user=user, message='Your beneficiary application is saved as a draft.' if application_draft else 'Welcome to FoodLoop. Your donor account is active. You can publish food listings immediately.' if immediate_donor else 'Welcome to FoodLoop. Your organisation is awaiting administrator verification. Review may take up to 72 hours.')
                 for admin in User.objects.filter(is_staff=True, is_active=True):
-                    message = f'New beneficiary registration (assessment not yet submitted): {org.name}' if application_draft else f'New organisation awaiting verification: {org.name}'
+                    message = f'New beneficiary registration (assessment not yet submitted): {org.name}' if application_draft else f'New donor registered with immediate posting access: {org.name}' if immediate_donor else f'New organisation awaiting verification: {org.name}'
                     Notification.objects.create(user=admin, message=message[:240])
         except IntegrityError:
             form.add_error('username', 'This username was just registered. Choose another and try again.')
@@ -99,6 +100,9 @@ def signup(request):
                 request.session.pop('beneficiary_eligibility', None)
                 messages.success(request, 'Account created. Your beneficiary application is saved as a draft. Complete it when you are ready to submit for review.')
                 return redirect('beneficiary_application')
+            if immediate_donor:
+                messages.success(request, 'Your donor account is ready. Publish your first listing now; no administrator approval is required.')
+                return redirect('create_listing')
             messages.success(request, 'Account created. Your organisation is awaiting verification. Review may take up to 72 hours; you can list or request food once approved.')
             return redirect('home')
     return render(request, 'signup.html', {'form': form, 'signup_type': signup_type if signup_type in ('provider', 'recipient') else ''})

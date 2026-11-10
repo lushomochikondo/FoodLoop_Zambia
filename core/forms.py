@@ -59,6 +59,7 @@ class ListingForm(forms.ModelForm):
         for name, prompt in {'unit': 'Choose a unit', 'pathway': 'Choose a recovery pathway', 'condition': 'Choose the food condition'}.items():
             field = self.fields[name]
             field.choices = [('', prompt), *field.choices]
+        self.fields['pathway'].help_text = 'Human consumption listings appear to beneficiaries. Animal feed and compost listings appear only to recovery partners approved for that pathway.'
         now = timezone.localtime()
         self.fields['deadline'].widget.attrs['min'] = now.strftime('%Y-%m-%dT%H:%M')
         self.fields['deadline'].help_text = 'Times use Zambia time (CAT, UTC+2). Choose a future date and time.'
@@ -132,7 +133,7 @@ class SignupForm(UserCreationForm):
     contact_name = forms.CharField(max_length=140, label='Your full name')
     phone = forms.CharField(max_length=40, label='Contact phone')
     area = forms.CharField(max_length=100, label='General area', widget=forms.TextInput(attrs={'placeholder': 'For example, Lusaka Central'}))
-    physical_address = forms.CharField(max_length=240, label='Organisation address', help_text='For administrator verification. Your pickup address stays private until acceptance.')
+    physical_address = forms.CharField(max_length=240, label='Organisation address', help_text='For account records and collection coordination. Your pickup address stays private until acceptance.')
     registration_reference = forms.CharField(max_length=160, required=False, label='Registration or recognition reference (if applicable)')
     activity_description = forms.CharField(max_length=2000, label='What does your organisation do?', help_text='Describe whom you serve, your food business, animals kept, or composting activity.', widget=forms.Textarea(attrs={'rows': 3}))
     handling_capacity = forms.CharField(max_length=2000, required=False, label='Food storage and handling capacity', help_text='Required for organisations receiving food for people.', widget=forms.Textarea(attrs={'rows': 3}))
