@@ -17,7 +17,7 @@ On a listing's detail page, **Edit listing** is available while it is available 
 
 ## Recipients and recovery partners
 
-Sign in as `recipient` or `school` for food for people, `farm` for animal feed, or `compost` for organic recovery. Only approved-pathway listings are shown. Matches are ranked by location (30%), deadline urgency (30%), quantity fit (20%) and condition suitability (20%). Each match includes a score and reasons. Organisation preferences and provisional nearby areas can be adjusted by the administrator/configuration.
+Sign in as `recipient` or `school` for food for people, `farm` for animal feed, or `compost` for organic recovery. Beneficiaries can browse all recovery pathways. Collection requests are limited to the account's approved use. Livestock farmer / animal feed and Composting / organic recovery are available in beneficiary registration alongside human-food programme types. Suitable listings receive match scores and appear first under Recommended; other pathways remain visible for browsing. Matches are ranked by location (30%), deadline urgency (30%), quantity fit (20%) and condition suitability (20%). Each match includes a score and reasons. Organisation preferences and provisional nearby areas can be adjusted by the administrator/configuration.
 
 Use the food, pathway and area filters to find donations. Open a listing, request a quantity, and accept the safety acknowledgement. The exact pickup address and phone remain hidden until acceptance. After collection, confirm the full quantity. Use **Cancel** if the collection cannot proceed. Use **Report a concern** on the listing to flag inaccurate or unsafe information for review.
 

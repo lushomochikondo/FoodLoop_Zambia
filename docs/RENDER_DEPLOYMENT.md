@@ -89,3 +89,7 @@ Approval emails remain disabled until a working sender is configured. On Render 
 ## Immediate donor publishing
 
 Donor registrations receive posting access immediately and open the listing editor after signup. Migration 0025 enables existing pending donor accounts and records an audit entry. It does not reactivate suspended, declined or needs-information accounts. Beneficiary and recovery partner approvals remain required. Published human-consumption listings appear immediately to eligible beneficiaries; feed and compost remain restricted to matching recovery partners. Donor onboarding and the listing editor explain this audience distinction.
+
+## Inclusive beneficiary categories and browsing
+
+Beneficiary registration includes livestock farmers and composting operators alongside human-food programmes. Each account currently has one approved recovery pathway. Animal-feed and compost applications use relevant handling and accountability fields rather than human-feeding counts or food-handler fields. Beneficiaries can browse all available pathways; collection forms and server-side requests remain limited to the approved use. Listing pins, written addresses and access reports retain their existing privacy controls. Migration 0026 records the new programme choices.

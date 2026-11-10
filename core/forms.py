@@ -59,7 +59,7 @@ class ListingForm(forms.ModelForm):
         for name, prompt in {'unit': 'Choose a unit', 'pathway': 'Choose a recovery pathway', 'condition': 'Choose the food condition'}.items():
             field = self.fields[name]
             field.choices = [('', prompt), *field.choices]
-        self.fields['pathway'].help_text = 'Human consumption listings appear to beneficiaries. Animal feed and compost listings appear only to recovery partners approved for that pathway.'
+        self.fields['pathway'].help_text = "All beneficiaries can browse every pathway. Collection requests are enabled only for the account's approved use: human consumption, animal feed or composting."
         now = timezone.localtime()
         self.fields['deadline'].widget.attrs['min'] = now.strftime('%Y-%m-%dT%H:%M')
         self.fields['deadline'].help_text = 'Times use Zambia time (CAT, UTC+2). Choose a future date and time.'
@@ -136,7 +136,7 @@ class SignupForm(UserCreationForm):
     physical_address = forms.CharField(max_length=240, label='Organisation address', help_text='For account records and collection coordination. Your pickup address stays private until acceptance.')
     registration_reference = forms.CharField(max_length=160, required=False, label='Registration or recognition reference (if applicable)')
     activity_description = forms.CharField(max_length=2000, label='What does your organisation do?', help_text='Describe whom you serve, your food business, animals kept, or composting activity.', widget=forms.Textarea(attrs={'rows': 3}))
-    handling_capacity = forms.CharField(max_length=2000, required=False, label='Food storage and handling capacity', help_text='Required for organisations receiving food for people.', widget=forms.Textarea(attrs={'rows': 3}))
+    handling_capacity = forms.CharField(max_length=2000, required=False, label='Storage and handling capacity', help_text='Describe safe storage, handling and transport for your intended recovery use.', widget=forms.Textarea(attrs={'rows': 3}))
     authorised_representative = forms.BooleanField(required=False, label='I am authorised to list food on behalf of this organisation (required for donors).')
     terms_accepted = forms.BooleanField(label='I agree to the food-sharing terms and have read the privacy notice.')
     email_updates = forms.BooleanField(required=False, initial=True, label='Email me updates about my account, requests and collections.')
@@ -167,7 +167,7 @@ class SignupForm(UserCreationForm):
         if data.get('account_type') == 'provider' and not data.get('authorised_representative'):
             self.add_error('authorised_representative', 'Confirm that you are authorised to list food for this organisation.')
         if data.get('account_type') == 'recipient' and not data.get('handling_capacity'):
-            self.add_error('handling_capacity', 'Describe how you can safely store and handle the food.')
+            self.add_error('handling_capacity', 'Describe how you can safely store and handle food or recovery materials.')
         return data
 
 
@@ -228,15 +228,28 @@ class BeneficiaryApplicationForm(forms.ModelForm):
     def __init__(self, *args, submitting=False, **kwargs):
         super().__init__(*args, **kwargs)
         self.submitting = submitting
+        pathway = self.instance.organisation.pathway if self.instance.organisation_id else 'human'
+        self.recovery_pathway = pathway
+        self.fields['programme_type'].choices = [('', 'Select a programme type')] + [(value, label) for value, label in BeneficiaryApplication.PROGRAMMES if BeneficiaryApplication.pathway_for_programme(value) == pathway]
+        if pathway != 'human':
+            for name in ('people_served', 'feeding_days_per_week', 'health_clearance', 'health_clearance_note', 'health_document', 'food_handler_evidence', 'food_handler_note', 'nondiscrimination_agreement'):
+                self.fields.pop(name)
+            self.fields['storage_description'].label = 'Describe the animals, feed use, storage and transport' if pathway == 'feed' else 'Describe the composting process, site, storage and transport'
+            self.fields['has_food_transport'].label = 'We have suitable transport for collection materials'
+            self.fields['beneficiary_records'].label = 'We keep records of collections and how materials are used'
+            self.fields['no_resale_agreement'].label = 'We will use collected materials for the approved recovery purpose and will not resell or barter them'
         for field in self.fields.values():
             field.required = False
         if submitting:
             for name in ('legal_form', 'programme_type', 'people_served', 'feeding_days_per_week', 'health_clearance', 'food_handler_evidence', 'storage_description'):
-                self.fields[name].required = True
+                if name in self.fields:
+                    self.fields[name].required = True
             for name in ('beneficiary_records', 'no_resale_agreement', 'nondiscrimination_agreement', 'inspection_consent', 'information_accuracy'):
-                self.fields[name].required = True
+                if name in self.fields:
+                    self.fields[name].required = True
         for name in ('registration_document', 'health_document', 'supporting_document'):
-            self.fields[name].help_text = f'PDF, JPG or PNG, up to {UPLOAD_MAX_MB} MB. Files are visible only to you and FoodLoop administrators.'
+            if name in self.fields:
+                self.fields[name].help_text = f'PDF, JPG or PNG, up to {UPLOAD_MAX_MB} MB. Files are visible only to you and FoodLoop administrators.'
 
     def clean(self):
         cleaned = super().clean()

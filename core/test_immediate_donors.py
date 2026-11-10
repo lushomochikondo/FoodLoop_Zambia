@@ -30,8 +30,9 @@ class ImmediateDonorTests(TestCase):
         self.assertContains(self.client.get('/'), 'Immediate food')
         self.assertContains(self.client.get(f'/listings/{listing.pk}/'), 'Request collection')
         listing.pathway='compost';listing.condition='spoiled';listing.save()
-        self.assertNotContains(self.client.get('/'), 'Immediate food')
-        self.assertEqual(self.client.get(f'/listings/{listing.pk}/').status_code,404)
+        self.assertContains(self.client.get('/'), 'Immediate food')
+        self.assertEqual(self.client.get(f'/listings/{listing.pk}/').status_code,200)
+        self.assertEqual(self.client.post(f'/listings/{listing.pk}/', {'quantity':'1','safety':'on'}).status_code,403)
 
     def test_policy_migration_activates_pending_donors_only(self):
         donors = {status:Organisation.objects.create(name=status,role='provider',status=status,area='Lusaka') for status in ('pending','approved','suspended','rejected','needs_info')}

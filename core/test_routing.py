@@ -67,7 +67,8 @@ class CollectionRouteTests(TestCase):
         self.org.status = 'approved'
         self.org.pathway = 'feed'
         self.org.save()
-        self.assertEqual(self.post({'latitude':-15,'longitude':28}).status_code, 404)
+        self.assertEqual(self.post({'latitude':-15,'longitude':28}).status_code, 422)
+        get.reset_mock()
         self.org.pathway = 'human'
         self.org.save()
         self.listing.pickup_latitude = self.listing.pickup_longitude = None

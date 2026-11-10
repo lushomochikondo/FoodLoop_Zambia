@@ -83,8 +83,9 @@ class AcceptanceTests(TestCase):
     def test_tc09_tc10_pathway_area_food_and_availability(self):
         feed = Listing.objects.create(provider=self.provider.membership.organisation, name='Animal material', quantity=10, pathway='feed', condition='spoiled', area='Other area', address='Secret', deadline=timezone.now()+timedelta(hours=5), safety_acknowledged=True)
         self.client.force_login(self.recipient)
-        self.assertNotContains(self.client.get('/'), 'Animal material')
-        self.assertEqual(self.client.get(f'/listings/{feed.pk}/').status_code, 404)
+        self.assertContains(self.client.get('/'), 'Animal material')
+        self.assertEqual(self.client.get(f'/listings/{feed.pk}/').status_code, 200)
+        self.assertEqual(self.client.post(f'/listings/{feed.pk}/', {'quantity':'1','safety':'on'}).status_code, 403)
         self.assertContains(self.client.get('/?q=Bread&area=Lusaka&pathway=human&availability=available'), 'Bread')
         self.assertNotContains(self.client.get('/?area=Unknown'), 'Bread')
         self.client.force_login(self.provider)

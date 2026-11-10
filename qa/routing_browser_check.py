@@ -31,6 +31,11 @@ with TemporaryDirectory(prefix='foodloop-map-browser-') as temp:
     donor, donor_org = account('Map demo donor', 'provider')
     recipient, recipient_org = account('Map demo recipient', 'recipient')
     listing = Listing.objects.create(provider=donor_org, name='Map test vegetables', quantity=10, pathway='human', condition='fresh', area='Lusaka', address='Private entrance', deadline=timezone.now()+timedelta(hours=4), safety_acknowledged=True, pickup_latitude='-15.416789', pickup_longitude='28.283456', access_surface='gravel', access_condition='rough', access_notes='Final 600 m is muddy after rain.', access_reported_at=timezone.now())
+    compost = Listing.objects.create(provider=donor_org, name='DEMO - Compost browser test', quantity=10, pathway='compost', condition='spoiled', area='Lusaka', address='PRIVATE-COMPOST-ENTRANCE', deadline=timezone.now()+timedelta(days=2), safety_acknowledged=True)
+    farm, farm_org = account('Farm applicant', 'recipient')
+    farm_org.pathway='feed'; farm_org.status='draft'; farm_org.save()
+    from core.models import BeneficiaryApplication
+    BeneficiaryApplication.objects.create(organisation=farm_org,programme_type='livestock_farmer')
     log = subprocess.DEVNULL
     server = subprocess.Popen([sys.executable, 'manage.py', 'runserver', '127.0.0.1:8011', '--noreload', '--settings=config.test_settings'], cwd=ROOT, stdout=log, stderr=log)
     try:
@@ -43,7 +48,7 @@ with TemporaryDirectory(prefix='foodloop-map-browser-') as temp:
             time.sleep(.25)
         else: raise RuntimeError('Local test server did not start')
         cookies = {}
-        for user in (donor, recipient):
+        for user in (donor, recipient, farm):
             client = Client(); client.force_login(user)
             cookies[user.pk] = client.cookies['sessionid'].value
         from django.db import connections
@@ -59,6 +64,24 @@ with TemporaryDirectory(prefix='foodloop-map-browser-') as temp:
             def login(user):
                 context.clear_cookies()
                 context.add_cookies([{'name':'sessionid','value':cookies[user.pk],'url':base}])
+            page.set_viewport_size({'width':390,'height':900})
+            page.goto(base+'/beneficiary/eligibility/')
+            assert page.locator('#id_programme_type option[value="livestock_farmer"]').count()==1
+            assert page.locator('#id_programme_type option[value="composting_operator"]').count()==1
+            page.locator('#id_programme_type').select_option('livestock_farmer')
+            page.locator('#id_accepted').check()
+            page.locator('.eligibility-continue-form button').click()
+            page.wait_for_url('**/signup/?type=recipient')
+            assert page.locator('#id_handling_capacity').count()==1
+            login(farm)
+            page.goto(base+'/beneficiary/application/')
+            assert page.locator('#id_people_served').count()==0
+            assert page.locator('#id_health_clearance').count()==0
+            assert page.locator('#id_storage_description').count()==1
+            assert 'animals, feed use' in page.content()
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+            page.screenshot(path=str(ROOT/'qa/livestock-beneficiary-390.png'),full_page=True)
+            print('390px inclusive onboarding: livestock/compost options, signup, relevant livestock assessment and layout PASS',flush=True)
             login(donor)
             for width in (390, 1440):
                 page.set_viewport_size({'width':width,'height':900})
@@ -103,6 +126,13 @@ with TemporaryDirectory(prefix='foodloop-map-browser-') as temp:
             assert json.loads(page.locator('#route-destination').text_content())['latitude'] == -10.2117
             print('Kasama listing: browser publish, northern pickup pin and road report persisted PASS', flush=True)
             login(recipient)
+            page.goto(base+'/')
+            assert 'DEMO - Compost browser test' in page.content()
+            page.goto(base+f'/listings/{compost.pk}/')
+            assert page.locator('.request-panel form').count()==0
+            assert 'Browse this listing' in page.content()
+            assert 'PRIVATE-COMPOST-ENTRANCE' not in page.content()
+            print('Cross-pathway browsing: compost visible to human beneficiary, no incompatible request, private address hidden PASS',flush=True)
             for width in (390, 1440):
                 page.set_viewport_size({'width':width,'height':900})
                 page.goto(base+f'/listings/{listing.pk}/')

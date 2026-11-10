@@ -273,7 +273,7 @@ def verify_organisation(user, pk, status, reason):
     if not user.is_staff: raise PermissionDenied
     if status not in ['approved', 'needs_info', 'rejected', 'suspended'] or not reason.strip(): raise ValidationError('Choose a decision and provide a reason.')
     org = Organisation.objects.select_for_update().get(pk=pk)
-    if status == 'approved' and (org.role == 'recipient' and org.pathway != 'human' or org.role == 'recovery' and org.pathway == 'human'):
+    if status == 'approved' and org.role == 'recovery' and org.pathway == 'human':
         raise ValidationError('The approved pathway does not match this organisation role.')
     if status == 'approved':
         required = {'physical_address': 'physical address', 'contact_name': 'named contact', 'contact_email': 'contact email', 'phone': 'contact phone', 'activity_description': 'activity or beneficiaries', 'terms_accepted': 'terms acknowledgement'}
@@ -287,8 +287,14 @@ def verify_organisation(user, pk, status, reason):
                 application = None
             if not application or not application.submitted_at:
                 missing.append('submitted beneficiary assessment')
-            elif not all([application.legal_form, application.programme_type, application.people_served, application.feeding_days_per_week, application.health_clearance, application.food_handler_evidence, application.storage_description.strip(), application.beneficiary_records, application.no_resale_agreement, application.nondiscrimination_agreement, application.inspection_consent, application.information_accuracy]):
-                missing.append('completed beneficiary assessment and required acknowledgements')
+            else:
+                evidence = [application.legal_form, application.programme_type, application.storage_description.strip(), application.beneficiary_records, application.no_resale_agreement, application.inspection_consent, application.information_accuracy]
+                if org.pathway == 'human':
+                    evidence += [application.people_served, application.feeding_days_per_week, application.health_clearance, application.food_handler_evidence, application.nondiscrimination_agreement]
+                if not all(evidence):
+                    missing.append('completed beneficiary assessment and required acknowledgements')
+                if BeneficiaryApplication.pathway_for_programme(application.programme_type) != org.pathway:
+                    missing.append('programme type matching the approved recovery pathway')
         if missing: raise ValidationError('Complete the verification evidence first: ' + ', '.join(missing) + '.')
     org.status = status
     org.verification_reason = reason

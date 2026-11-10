@@ -109,5 +109,5 @@ class WorkflowTests(TestCase):
     def test_pathway_filter_preserves_eligibility(self):
         Listing.objects.create(provider=self.provider.membership.organisation, name='Animal only', quantity=10, unit='kg', pathway='feed', condition='spoiled', area='Lusaka', address='Secret', deadline=timezone.now()+timedelta(hours=8), safety_acknowledged=True)
         self.client.force_login(self.recipient)
-        self.assertNotContains(self.client.get('/?pathway=feed'), 'Animal only')
+        self.assertContains(self.client.get('/?pathway=feed'), 'Animal only')
         self.assertContains(self.client.get('/?q=Bread'), 'Bread')

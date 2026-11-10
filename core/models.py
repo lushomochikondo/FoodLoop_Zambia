@@ -43,7 +43,13 @@ class BeneficiaryApplication(models.Model):
         ('aged_care', 'Aged-care organisation'),
         ('orphans_vulnerable_children', 'Orphans and vulnerable children programme'),
         ('community_kitchen', 'Community kitchen'),
+        ('livestock_farmer', 'Livestock farmer / animal feed'),
+        ('composting_operator', 'Composting / organic recovery'),
     ]
+    @staticmethod
+    def pathway_for_programme(programme):
+        return {'livestock_farmer': 'feed', 'composting_operator': 'compost'}.get(programme, 'human')
+
     LEGAL_FORMS = [('ngo','NGO'),('society','Society / community organisation'),('company','Company / trust'),('community','Informal community group'),('other','Other / unsure')]
     EVIDENCE = [('yes','Yes'),('applied','Applied / being renewed'),('not_required','Not applicable to our activities')]
     organisation = models.OneToOneField(Organisation, on_delete=models.CASCADE, related_name='beneficiary_application')

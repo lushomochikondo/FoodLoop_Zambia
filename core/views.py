@@ -77,7 +77,8 @@ def signup(request):
                 user.save()
                 application_draft = account_type == 'recipient'
                 immediate_donor = account_type == 'provider'
-                org = Organisation.objects.create(name=form.cleaned_data['organisation_name'], role=account_type if account_type in ['provider', 'recipient'] else 'recovery', pathway=account_type if account_type in ['feed', 'compost'] else 'human', status='draft' if application_draft else 'approved' if immediate_donor else 'pending', verification_reason='Donor posting enabled at registration; administrator approval is not required.' if immediate_donor else '', contact_name=form.cleaned_data['contact_name'], contact_email=form.cleaned_data['email'], phone=form.cleaned_data['phone'], area=form.cleaned_data['area'], physical_address=form.cleaned_data['physical_address'], registration_reference=form.cleaned_data['registration_reference'], activity_description=form.cleaned_data['activity_description'], handling_capacity=form.cleaned_data['handling_capacity'], authorised_representative=form.cleaned_data['authorised_representative'], terms_accepted=True)
+                beneficiary_pathway = BeneficiaryApplication.pathway_for_programme(acceptance.get('programme_type', ''))
+                org = Organisation.objects.create(name=form.cleaned_data['organisation_name'], role=account_type if account_type in ['provider', 'recipient'] else 'recovery', pathway=beneficiary_pathway if application_draft else account_type if account_type in ['feed', 'compost'] else 'human', status='draft' if application_draft else 'approved' if immediate_donor else 'pending', verification_reason='Donor posting enabled at registration; administrator approval is not required.' if immediate_donor else '', contact_name=form.cleaned_data['contact_name'], contact_email=form.cleaned_data['email'], phone=form.cleaned_data['phone'], area=form.cleaned_data['area'], physical_address=form.cleaned_data['physical_address'], registration_reference=form.cleaned_data['registration_reference'], activity_description=form.cleaned_data['activity_description'], handling_capacity=form.cleaned_data['handling_capacity'], authorised_representative=form.cleaned_data['authorised_representative'], terms_accepted=True)
                 Membership.objects.create(user=user, organisation=org)
                 if application_draft:
                     BeneficiaryApplication.objects.create(
@@ -154,8 +155,8 @@ def visible(user):
     if user.is_staff: return listings
     org = organisation(user)
     if org.role == 'provider': return listings.filter(provider=org)
-    listings = listings.filter(provider__status='approved', pathway=org.pathway).filter(~Q(status='deleted')|Q(requests__recipient=org)).distinct()
-    return listings.exclude(condition='spoiled') if org.pathway == 'human' else listings
+    listings = listings.filter(provider__status='approved').filter(~Q(status='deleted')|Q(requests__recipient=org)).distinct()
+    return listings
 
 def workspace_context(request):
     expire_requests()
@@ -183,11 +184,15 @@ def workspace_context(request):
     if org and org.role != 'provider':
         ranked = []
         for listing in cards:
+            listing.can_collect = org.status == 'approved' and org.pathway == listing.pathway and not (org.pathway == 'human' and listing.condition == 'spoiled')
             match = rank_listing(listing, org)
             if match:
                 listing.match_score, listing.match_reason = match
-                ranked.append(listing)
-        cards = sorted(ranked, key=lambda item: (-item.match_score, item.deadline, item.pk))
+            else:
+                listing.match_score = None
+                listing.match_reason = f'For {listing.get_pathway_display().lower()}. Your account is approved for {org.get_pathway_display().lower()}.'
+            ranked.append(listing)
+        cards = sorted(ranked, key=lambda item: (item.match_score is None, -(item.match_score or 0), item.deadline, item.pk))
     collected = requests.filter(status='collected')
     kg = collected.aggregate(n=Sum('confirmed_weight_kg'))['n'] or Decimal('0')
     human = collected.filter(listing__pathway='human').aggregate(n=Sum('confirmed_weight_kg'))['n'] or Decimal('0')
@@ -358,7 +363,7 @@ def detail(request, pk):
     form.fields['quantity'].widget.attrs.update({'max': str(listing.remaining), 'step':'0.01'})
     from .routing import destination_for
     route_destination = destination_for(listing, request.user, org) if request.user.is_staff or (org and org.status == 'approved') else None
-    return render(request, 'detail.html', {'route_destination':route_destination, 'org':org,'listing': listing, 'form': form, 'show_private': provider or accepted or request.user.is_staff, 'can_request': org and org.role != 'provider' and org.status == 'approved' and listing.available, 'is_provider': provider, 'can_edit': provider and listing.available and listing.allocated == 0, 'can_delete':provider and org.status == 'approved' and listing.status != 'deleted', 'can_flag': org and org.role != 'provider' and org.status == 'approved', 'history': history, 'requests':history,'return_to_listing':True,'flag_form': FlagForm()})
+    return render(request, 'detail.html', {'route_destination':route_destination, 'org':org,'listing': listing, 'form': form, 'show_private': provider or accepted or request.user.is_staff, 'can_request': org and org.role != 'provider' and org.status == 'approved' and org.pathway == listing.pathway and not (org.pathway == 'human' and listing.condition == 'spoiled') and listing.available, 'is_provider': provider, 'can_edit': provider and listing.available and listing.allocated == 0, 'can_delete':provider and org.status == 'approved' and listing.status != 'deleted', 'can_flag': org and org.role != 'provider' and org.status == 'approved', 'history': history, 'requests':history,'return_to_listing':True,'flag_form': FlagForm()})
 
 @login_required
 @require_POST
