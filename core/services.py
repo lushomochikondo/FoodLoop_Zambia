@@ -124,10 +124,10 @@ def expire_requests():
 def request_food(user, listing_id, quantity, acknowledged):
     org = organisation(user)
     listing = Listing.objects.select_for_update().get(pk=listing_id)
-    if org.status != 'approved' or org.role not in ['recipient', 'recovery'] or org.pathway != listing.pathway: raise PermissionDenied
+    if org.status != 'approved' or org.role not in ['recipient', 'recovery']: raise PermissionDenied
     if not acknowledged: raise ValidationError('Accept the safety acknowledgement.')
     if not listing.available or quantity <= 0 or quantity > listing.remaining: raise ValidationError('The requested quantity is unavailable.')
-    if listing.condition == 'spoiled' and org.pathway == 'human': raise PermissionDenied
+    if listing.condition == 'spoiled' and listing.pathway == 'human': raise PermissionDenied
     obj = FoodRequest.objects.create(listing=listing, recipient=org, quantity=quantity)
     record(obj, user, 'Request submitted')
     notify(listing.provider, f'New request: {org.name} requested {quantity} {listing.unit} of {listing.name}.', listing)
@@ -155,7 +155,7 @@ def change_request(user, pk, action, code='', confirmed_weight_kg=None, confirme
         if not listing.available or req.quantity > listing.remaining: raise ValidationError('Insufficient quantity or listing unavailable.')
         expiry_hours = platform_setting('request_expiry_hours', settings.REQUEST_EXPIRY_HOURS, Decimal)
         if req.created <= timezone.now()-timedelta(hours=float(expiry_hours)): raise ValidationError('This request has expired.')
-        if req.recipient.status != 'approved' or req.recipient.pathway != listing.pathway: raise ValidationError('Recipient is no longer eligible.')
+        if req.recipient.status != 'approved' or req.recipient.role not in ['recipient', 'recovery']: raise ValidationError('Recipient is no longer eligible.')
         listing.allocated += req.quantity
         listing.save(update_fields=['allocated'])
         req.status = 'accepted'

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.utils import timezone
 
 def rank_listing(listing, org):
-    """Hard suitability filter, then transparent configurable 100-point scoring."""
+    """Recommend listings matching the main recovery interest; this does not restrict requests."""
     if not listing.available or listing.pathway != org.pathway or (org.pathway == 'human' and listing.condition == 'spoiled'):
         return None
     same = listing.area.casefold() == org.area.casefold()

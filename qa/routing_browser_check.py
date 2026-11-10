@@ -138,10 +138,17 @@ with TemporaryDirectory(prefix='foodloop-map-browser-') as temp:
             page.goto(base+'/')
             assert 'DEMO - Compost browser test' in page.content()
             page.goto(base+f'/listings/{compost.pk}/')
-            assert page.locator('.request-panel form').count()==0
-            assert 'Browse this listing' in page.content()
+            assert page.locator('.request-panel form').count()==1
+            assert 'Request collection' in page.content()
             assert 'PRIVATE-COMPOST-ENTRANCE' not in page.content()
-            print('Cross-pathway browsing: compost visible to human beneficiary, no incompatible request, private address hidden PASS',flush=True)
+            page.locator('.request-panel #id_quantity').fill('1')
+            page.locator('.request-panel #id_safety').check()
+            page.locator('.request-panel form button').click()
+            page.wait_for_url(base+'/')
+            page.goto(base+'/requests/')
+            assert 'DEMO - Compost browser test' in page.content()
+            print('Cross-pathway request submitted through the browser and visible under Requests PASS',flush=True)
+            print('Cross-pathway browsing: compost visible and requestable by human-food organisation, private address hidden PASS',flush=True)
             for width in (390, 1440):
                 page.set_viewport_size({'width':width,'height':900})
                 page.goto(base+f'/listings/{listing.pk}/')

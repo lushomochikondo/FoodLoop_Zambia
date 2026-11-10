@@ -14,8 +14,6 @@ class OrganisationAdminForm(forms.ModelForm):
         data = super().clean()
         if data.get('status') not in ('pending', 'draft') and not data.get('verification_reason', '').strip():
             self.add_error('verification_reason', 'Record a reason for the verification decision.')
-        if data.get('role') == 'recipient' and data.get('pathway') != 'human':
-            self.add_error('pathway', 'Recipients for people must use Human Consumption.')
         if data.get('role') == 'recovery' and data.get('pathway') == 'human':
             self.add_error('pathway', 'Recovery partners must use Animal Feed or Composting.')
         return data

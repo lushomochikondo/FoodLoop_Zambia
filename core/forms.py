@@ -59,7 +59,7 @@ class ListingForm(forms.ModelForm):
         for name, prompt in {'unit': 'Choose a unit', 'pathway': 'Choose a recovery pathway', 'condition': 'Choose the food condition'}.items():
             field = self.fields[name]
             field.choices = [('', prompt), *field.choices]
-        self.fields['pathway'].help_text = "All beneficiaries can browse every pathway. Collection requests are enabled only for the account's approved use: human consumption, animal feed or composting."
+        self.fields['pathway'].help_text = "All approved beneficiaries can request from any pathway. The selected pathway tells them the intended use: human consumption, animal feed or composting."
         now = timezone.localtime()
         self.fields['deadline'].widget.attrs['min'] = now.strftime('%Y-%m-%dT%H:%M')
         self.fields['deadline'].help_text = 'Times use Zambia time (CAT, UTC+2). Choose a future date and time.'
@@ -95,7 +95,7 @@ class ListingForm(forms.ModelForm):
 
 class RequestForm(forms.Form):
     quantity = forms.DecimalField(min_value=0.01, max_digits=10, decimal_places=2)
-    safety = forms.BooleanField(label='FoodLoop does not certify food as safe. I will inspect it on collection, use it only for my approved pathway, and will not resell it.')
+    safety = forms.BooleanField(label='Our organisation can safely collect, handle and use this item for the purpose shown on the listing. I will inspect it at collection and will not resell it. FoodLoop does not certify food as safe.')
 
 class FlagForm(forms.Form):
     reason = forms.CharField(max_length=2000, min_length=5, label='What should we review?', widget=forms.Textarea(attrs={'rows': 4, 'placeholder': 'Describe the safety concern or inaccurate information.'}))

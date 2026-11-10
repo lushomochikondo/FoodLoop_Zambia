@@ -97,3 +97,7 @@ Beneficiary registration includes livestock farmers and composting operators alo
 ## Map tile request identification
 
 Leaflet tile images explicitly use strict-origin-when-cross-origin so OpenStreetMap receives FoodLoop's origin even though the rest of the app uses Django's same-origin referrer policy. This avoids missing-referrer access blocks without exposing page paths or coordinates in the Referer header. Browser map checks mock tile responses and verify the actual outgoing Referer; they do not automate pan/zoom requests against public OSM tile servers.
+
+## Open requests for multi-purpose beneficiaries
+
+Approved beneficiaries and recovery partners can request any available recovery pathway. The organisation's main category tailors onboarding and recommendations, but does not restrict requests or donor acceptance. Each request acknowledges the listing's stated purpose, suitable handling and no resale. Suspended/unapproved accounts remain blocked; quantity, deadline, private pickup details and handover checks remain enforced. A spoiled item incorrectly classified for human consumption cannot be requested. No database migration is required.

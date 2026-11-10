@@ -85,7 +85,7 @@ class AcceptanceTests(TestCase):
         self.client.force_login(self.recipient)
         self.assertContains(self.client.get('/'), 'Animal material')
         self.assertEqual(self.client.get(f'/listings/{feed.pk}/').status_code, 200)
-        self.assertEqual(self.client.post(f'/listings/{feed.pk}/', {'quantity':'1','safety':'on'}).status_code, 403)
+        self.assertEqual(self.client.post(f'/listings/{feed.pk}/', {'quantity':'1','safety':'on'}).status_code, 302)
         self.assertContains(self.client.get('/?q=Bread&area=Lusaka&pathway=human&availability=available'), 'Bread')
         self.assertNotContains(self.client.get('/?area=Unknown'), 'Bread')
         self.client.force_login(self.provider)
