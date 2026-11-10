@@ -107,3 +107,7 @@ Approved beneficiaries and recovery partners can request any available recovery 
 The workspace header now hides when scrolling down and reveals when scrolling up, matching the landing page, with keyboard focus and drawer access preserved. Stock uses the existing reservation ledger; collected quantities are derived from completed requests and are not deducted a second time. A private no-cache stock endpoint drives 30-second foreground updates. Exhausted or fully reserved listings leave recipient feeds automatically and their records remain available. No schema migration is required.
 
 The install button now handles a native prompt, unavailable/dismissed prompts, installed mode and manual browser instructions. Service-worker registration errors are surfaced and manifests use application/manifest+json. Normal-profile Edge installability diagnostics returned no errors; browser tests simulate install events rather than installing on the user's OS.
+
+## Workspace visual refresh and themes
+
+Authenticated pages use a warm light palette or forest dark palette, refined listing cards and the existing landing hero photograph in the greeting banner. A moon/sun toggle beside the notification bell stores the device preference in localStorage; the small initialisation script applies it before styles render. Theme styles are scoped to authenticated pages. No database change or migration is required. Visual checks cover all three roles, mobile/desktop layouts, native controls, persistence, system preference, keyboard activation and cross-tab changes.

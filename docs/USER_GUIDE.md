@@ -72,3 +72,7 @@ A donor lists the original quantity. Pending requests do not reduce stock. Accep
 ### Installing FoodLoop
 
 Use Install app in the footer. Supporting browsers can show a native installation prompt. If no prompt is available, the button gives browser-menu instructions; on iPhone/iPad it explains Safari Share > Add to Home Screen. In an installed standalone window the button reads App installed. Private browsing or an existing installation can affect which install options the browser offers.
+
+### Workspace appearance
+
+Use the moon/sun button beside the notification bell to switch between light and dark mode. FoodLoop follows the device preference initially and remembers an explicit choice in browser storage. The choice applies across donor, beneficiary and administrator pages and synchronises between open tabs on the same browser. The greeting banner uses the landing-page hero photograph. Missing listing photos remain clearly labelled rather than being presented as actual food photographs.

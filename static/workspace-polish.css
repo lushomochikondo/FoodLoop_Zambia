@@ -1,0 +1,112 @@
+﻿/* Workspace colour system. Public pages keep their existing appearance. */
+.app{--ws-bg:#eeeee2;--ws-surface:#fffdf6;--ws-soft:#f1f2e8;--ws-ink:#233d2b;--ws-muted:#5d705d;--ws-line:#d9dfcf;--ws-gold:#d2b36b;--ws-control:#fafbf3;--ws-focus:#897035;--ws-shadow:0 14px 42px -24px #24452b45;color:var(--ws-ink);background:radial-gradient(ellipse at 90% 5%,#d5e2ce 0,transparent 45%),radial-gradient(ellipse at 5% 45%,#e9dfc5 0,transparent 48%),#eeeee2}
+html[data-theme=dark] .app{--ws-bg:#111e17;--ws-surface:#1b2b21;--ws-soft:#24372a;--ws-ink:#edf1e4;--ws-muted:#b2c0ac;--ws-line:#374d3a;--ws-gold:#ddc17b;--ws-control:#17271d;--ws-focus:#e7cf95;--ws-shadow:0 16px 46px -22px #0009;color-scheme:dark;background:radial-gradient(ellipse at 90% 0,#213c2b 0,transparent 48%),radial-gradient(ellipse at 5% 45%,#302e1f 0,transparent 55%),#111e17}
+.app .app-content{background:transparent}.app main{color:var(--ws-ink)}
+.app main :is(h1,h2,h3,h4){color:var(--ws-ink)}
+.app :is(.muted,.page-subtitle,.field-help,.section-kicker,.page-path,.listing-metadata,.results-note){color:var(--ws-muted)}
+.app :is(.report-panel,.analytics-panel,.area-impact-panel,.application-section,.application-status,.review-card,.notification-item,.request-panel,.detail-info,.editor-section,.profile-form,.collection-filter,.route-planner,.application-readonly){background:var(--ws-surface);color:var(--ws-ink);border-color:var(--ws-line);box-shadow:var(--ws-shadow)}
+.app :is(.request-panel,.detail-info,.route-planner,.application-section,.application-status,.review-card,.notification-item) :is(p,dt,small){color:var(--ws-muted)}
+.app :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,select){background:var(--ws-control)!important;color:var(--ws-ink)!important;border-color:var(--ws-line)!important}
+.app :is(input,textarea,select)::placeholder{color:var(--ws-muted)!important;opacity:.85}
+.app :is(input[type=checkbox],input[type=radio]){accent-color:#5c8350}
+.app :is(a,button,input,select,textarea):focus-visible{outline:3px solid var(--ws-focus)!important;outline-offset:4px}
+.app .masthead{background:linear-gradient(110deg,#143c2a,#234d34);border-bottom:1px solid #c3d8a823}
+.app .masthead-actions{gap:14px}
+.app .theme-toggle{display:grid;place-items:center;width:42px;height:42px;min-width:42px;min-height:42px;padding:10px;border:1px solid #d9e9c333;border-radius:50%;background:#ffffff09;color:#f1e6c5;box-shadow:none}
+.app .theme-toggle:hover{background:#ffffff18;transform:none}
+.app .theme-toggle svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+[data-theme-icon=light]{display:none}html[data-theme=dark] [data-theme-icon=dark]{display:none}html[data-theme=dark] [data-theme-icon=light]{display:block}
+/* The greeting uses the same photograph as the public landing hero. */
+.app .exchange-intro{min-height:264px;padding:40px 44px;margin-bottom:36px;border-radius:24px;border:1px solid #e1e8cf33;background:linear-gradient(100deg,#102d23ed 0%,#173c2ad9 40%,#183b2840 100%),url('images/hero-save-planet.jpg') center 55%/cover no-repeat;box-shadow:0 18px 40px -22px #15332190}
+.app .exchange-intro:after{background:linear-gradient(0deg,#0b241e40,transparent 65%)}
+.app .intro-copy{max-width:75%}.app .intro-greeting{color:#e0e8d5;font-size:1rem;font-weight:500;letter-spacing:.01em;margin-bottom:9px}
+.app .exchange-intro h1{color:#fffdf0;font-size:clamp(1.85rem,3.4vw,3rem);line-height:1.17;font-weight:650;letter-spacing:-.04em;margin-bottom:24px}
+.app .intro-meta{gap:10px;color:#eff1de}.app .intro-meta>span,.app .intro-meta>span+span{padding:7px 12px;border:1px solid #e5edce38;border-radius:7px;background:#102a213d;font-size:.8rem;line-height:1.5;backdrop-filter:blur(5px)}
+.app .exchange-heading h2{font-size:clamp(1.5rem,2.4vw,2rem);letter-spacing:-.035em}.app .exchange-heading .heading-count{background:#dee6d0;color:#294532;border:1px solid #ced8bc;font-size:.8rem;vertical-align:middle;padding:5px 10px}
+.app .exchange-toolbar{border:1px solid var(--ws-line);background:var(--ws-surface);border-radius:18px;box-shadow:var(--ws-shadow);overflow:hidden}
+.app .exchange-toolbar :is(.search-box,.filter-controls){background:transparent;border-color:var(--ws-line)}
+.app .exchange-toolbar .search-box input{background:transparent}.app .filter-controls label{color:var(--ws-muted)}
+/* Listing cards: a framed image, generous hierarchy and a distinct action shelf. */
+.app .exchange-listings .cards{gap:26px;align-items:stretch}
+.app .exchange-page .card{display:flex;flex-direction:column;min-width:0;padding:8px 8px 0;border:1px solid var(--ws-line);border-radius:22px;background:var(--ws-surface);color:var(--ws-ink);box-shadow:var(--ws-shadow);overflow:hidden;text-decoration:none;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.app .exchange-page .card:hover{transform:translateY(-5px);border-color:#9bb18a;box-shadow:0 23px 48px -24px #173a2860}
+.app .exchange-page .listing-visual{position:relative;aspect-ratio:1.58;border-radius:15px;isolation:isolate;overflow:hidden}
+.app .exchange-page .listing-visual>img{height:100%;width:100%;object-fit:cover}
+.app .exchange-page .photo-pathway{z-index:3;top:13px;left:13px;max-width:calc(100% - 90px);padding:7px 11px;border-radius:7px;background:#f5f4e6ed;color:#274331;border:1px solid #ffffff8c;font-size:.69rem;font-weight:650;letter-spacing:.025em;line-height:1.4;backdrop-filter:blur(8px)}
+.app .exchange-page .photo-pathway.feed{background:#f5e8cfee;color:#614f2a}.app .exchange-page .photo-pathway.compost{background:#efe0d3ee;color:#654b35}
+.app .exchange-page .free-label{z-index:3;top:13px;right:13px;display:grid;place-items:center;padding:7px 10px;border-radius:7px;background:#183c2de8;color:#f5edcd;border:1px solid #e2d59e4a;font-size:.67rem;letter-spacing:.08em;font-weight:750}
+.app .exchange-page .no-photo{position:relative;isolation:isolate;height:100%;min-height:170px;gap:7px;background:radial-gradient(ellipse at 80% 0,#b4c79c66,transparent 65%),linear-gradient(135deg,#2b503b,#183b30);color:#edf0db;overflow:hidden}
+.app .exchange-page [data-pathway=feed] .no-photo{background:radial-gradient(ellipse at 85% 0,#d0be7c66,transparent 65%),linear-gradient(130deg,#666c3d,#374a32)}
+.app .exchange-page [data-pathway=compost] .no-photo{background:radial-gradient(ellipse at 85% 0,#c8ac8466,transparent 65%),linear-gradient(130deg,#705b43,#394734)}
+.app .exchange-page .no-photo:before,.app .exchange-page .no-photo:after{content:'';position:absolute;z-index:-1;right:-36px;bottom:-75px;width:200px;height:200px;border:1px solid #e9efd326;border-radius:50%;pointer-events:none}
+.app .exchange-page .no-photo:after{width:280px;height:280px;right:-75px;bottom:-115px}
+.app .exchange-page .no-photo .empty-glyph{width:59px;height:59px;border-radius:17px;border:1px solid #e3d3a160;background:#1935266b;color:#e4d09b;box-shadow:0 9px 24px #10251933;margin-bottom:7px}
+.app .exchange-page .no-photo .premium-icon{width:29px;height:29px;color:inherit;stroke-width:1.3}
+.app .exchange-page .no-photo .photo-placeholder-label{font-size:.65rem;letter-spacing:.18em;font-weight:650;color:#eef0d9}.app .exchange-page .no-photo .photo-placeholder-note{font-size:.72rem;color:#d0dac6}
+.app .exchange-page .card-body{display:flex;flex-direction:column;flex:1;padding:22px 18px 0;min-width:0}
+.app .exchange-page .card-provider{font-size:.7rem;letter-spacing:.08em;line-height:1.5;text-transform:uppercase;color:var(--ws-muted);font-weight:600;margin-bottom:8px}
+.app .exchange-page .card h3{font-size:1.32rem;line-height:1.28;letter-spacing:-.025em;font-weight:650;color:var(--ws-ink);margin:0 0 12px;overflow-wrap:anywhere}
+.app .exchange-page .card-location{font-size:.8rem;color:var(--ws-muted);line-height:1.6;gap:6px;flex-wrap:wrap}.app .exchange-page .card-location svg{width:15px;height:15px;color:#6f8664}
+.app .exchange-page .match-reasons{font-size:.76rem;line-height:1.7;color:var(--ws-muted);margin-top:13px}
+.app .exchange-page .match-reasons b{display:inline-block;background:#e6ecd9;color:#365531;padding:3px 7px;border-radius:5px;font-size:.7rem;letter-spacing:.01em;margin:0 4px 4px 0}
+.app .exchange-page .listing-metadata{font-size:.72rem;color:var(--ws-muted);margin:10px 0 0}
+.app .exchange-page .card-divider{margin:18px 0;border-color:var(--ws-line)}
+.app .exchange-page .card-quantity{margin-top:auto;gap:10px;padding-top:2px}.app .exchange-page .quantity-label{font-size:.65rem;font-weight:650;letter-spacing:.1em;color:var(--ws-muted)}
+.app .exchange-page .card-quantity strong{font-size:2.25rem;font-weight:650;letter-spacing:-.055em;color:var(--ws-ink)}.app .exchange-page .card-quantity small{font-size:.9rem;font-weight:500;letter-spacing:0;color:var(--ws-muted)}
+.app .exchange-page .card-bottom{margin:20px -18px 0;padding:15px 18px;background:var(--ws-soft);border-color:var(--ws-line);gap:10px;flex-wrap:wrap}
+.app .exchange-page .card-bottom>span:first-child{font-size:.73rem;color:var(--ws-muted);line-height:1.6}
+.app .exchange-page .card-action{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#254e36;color:#f5efd9;padding:10px 11px;border-radius:9px;font-size:.75rem;font-weight:600;white-space:normal;line-height:1.4}
+.app .exchange-page .card-arrow{background:none;color:inherit;width:15px;height:15px;min-width:15px;border-radius:0;font-size:1rem}.app .exchange-page .card:hover .card-arrow{background:none;color:inherit;transform:translateX(2px)}
+/* Other authenticated pages share the softer surfaces and readable controls. */
+.app .stock-summary>div,.app .pickup-panel,.app .safety-note{background:var(--ws-soft);border-color:var(--ws-line);color:var(--ws-muted)}
+html[data-theme=dark] .app .exchange-heading .heading-count{background:#344a2f;color:#e5ebcc;border-color:#506644}
+html[data-theme=dark] .app .exchange-page .match-reasons b{background:#334a30;color:#d6e6bd}
+html[data-theme=dark] .app .exchange-page .card-action{background:#b4ce98;color:#1b3020}
+html[data-theme=dark] .app :is(.workspace-drawer,.drawer-title,.drawer-account){background:var(--ws-surface);border-color:var(--ws-line);color:var(--ws-ink)}
+html[data-theme=dark] .app .workspace-drawer .nav-item{color:var(--ws-muted)}html[data-theme=dark] .app .workspace-drawer .nav-item.active{background:#304530;color:#e3edce}
+html[data-theme=dark] .app :is(.drawer-account strong,.drawer-account span,.drawer-title span){color:var(--ws-ink)}
+html[data-theme=dark] .app :is(.nav-glyph,.drawer-signout,.quiet,.route-choice){background:var(--ws-soft);border-color:var(--ws-line);color:var(--ws-ink)}
+html[data-theme=dark] .app :is(.status,.private-label){background:#314532;color:#dce8c9;border-color:#4d6545}
+html[data-theme=dark] .app :is(.verification-pending,.verification-needs_info,.listing-status-expired){background:#453d26;color:#f3d999}
+html[data-theme=dark] .app :is(.verification-rejected,.verification-suspended,.listing-status-removed){background:#492b2a;color:#f1bbb2}
+html[data-theme=dark] .app .message{background:#373b27;border-color:#596043;color:#e3e8c8}
+html[data-theme=dark] .app :is(.pipeline,.stock-summary>div,.report-disclosure,.collection-filter,.route-arrival,.profile-org-grid,.dashboard-pathway){background:var(--ws-soft);color:var(--ws-ink);border-color:var(--ws-line)}
+html[data-theme=dark] .app :is(.analytics-stats section,.impact-panel,.chart-track,.heatmap-summary,.application-checks label,.acknowledgement,.upload-zone){background:var(--ws-surface);color:var(--ws-ink);border-color:var(--ws-line)}
+html[data-theme=dark] .app :is(.analytics-stats strong,.analytics-stats h2,.pipeline strong,.stock-summary dd,.evidence dd){color:var(--ws-ink)}
+html[data-theme=dark] .app :is(.pipeline-stage,.pipeline small,.analytics-stats p,.analytics-stats section>div,.detail-location,.evidence dt,.application-header p){color:var(--ws-muted)}
+html[data-theme=dark] .app a.text-link{color:#c5dca6}
+@media(max-width:900px){.app .exchange-intro{padding:32px;min-height:240px}.app .intro-copy{max-width:90%}.app .exchange-listings .cards{gap:20px}}
+@media(max-width:640px){.app .masthead-inner{gap:9px}.app .masthead-actions{gap:9px}.app .theme-toggle{width:44px;height:44px;min-width:44px;min-height:44px;padding:10px}.app .exchange-intro{min-height:245px;padding:28px 24px;border-radius:18px;margin-bottom:28px;background-position:62% center}.app .intro-copy{max-width:100%}.app .exchange-intro h1{font-size:1.9rem}.app .intro-meta{gap:8px}.app .intro-meta>span,.app .intro-meta>span+span{padding:6px 9px;font-size:.72rem}.app .exchange-listings .cards{gap:22px}.app .exchange-page .card{border-radius:20px}.app .exchange-page .listing-visual{aspect-ratio:1.65}.app .exchange-page .card-body{padding:21px 18px 0}.app .exchange-page .card-bottom{margin:18px -18px 0;padding:15px 18px}.app .exchange-page .card h3{font-size:1.3rem}}
+@media(max-width:359px){.app .masthead-inner{gap:7px}.app .masthead-actions{gap:7px}.app .exchange-intro{padding:24px 20px}.app .exchange-page .card-bottom{align-items:stretch;flex-direction:column}.app .exchange-page .card-action{margin-left:0}}
+@media(hover:none){.app .exchange-page .card:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.app .exchange-page .card,.app .exchange-page .card-arrow{transition:none!important}.app .exchange-page .card:hover{transform:none}}
+
+.app{--muted:var(--ws-muted);--line:var(--ws-line)}
+html[data-theme=dark] .app .nav-glyph svg{color:#bed4ac}
+
+.app{--fl-ink:var(--ws-ink);--fl-muted:var(--ws-muted);--fl-line:var(--ws-line);--fl-shadow:var(--ws-shadow)}
+.app .back-link,.app .request-price span{color:var(--ws-muted)}
+.app .detail-facts>div>span{color:var(--ws-muted)}.app .detail-facts strong [data-stock-remaining]{display:inline;font:inherit;letter-spacing:inherit;color:inherit}
+.app .detail-photo .no-photo{background:linear-gradient(145deg,#e0e7d4,#ebe9da);color:var(--ws-muted)}
+html[data-theme=dark] .app .detail-photo .no-photo{background:linear-gradient(145deg,#304632,#1e3427);color:#c4d3b7}
+html[data-theme=dark] .app .detail-photo .no-photo span{color:#c4d3b7}
+html[data-theme=dark] .app .dashboard-page .pipeline>a{background:var(--ws-soft);border-color:var(--ws-line)}
+html[data-theme=dark] .app .dashboard-page .pipeline>a:hover{background:#334c33}
+html[data-theme=dark] .app :is(.chart-day,.chart-value,.heatmap-summary span,.heatmap-summary dt,.heatmap-summary dd,.heatmap-day-labels,.heatmap-week-label,.heatmap-bottom,.area-heat-legend,.panel-heading p,.activity-list p,.activity-list time){color:var(--ws-muted)}
+html[data-theme=dark] .app .heatmap-summary>strong{color:var(--ws-ink)}
+html[data-theme=dark] .app :is(.chart-unit,.period-label){background:var(--ws-soft);color:var(--ws-muted);border-color:var(--ws-line)}
+html[data-theme=dark] .app :is(.analytics-stats a,.panel-link,.pipeline-panel .panel-heading a){color:#c8dcae}
+html[data-theme=dark] .app .recovery-ring>div{background:var(--ws-surface);color:var(--ws-ink)}
+html[data-theme=dark] .app .recovery-ring strong{color:var(--ws-ink)}
+html[data-theme=dark] .app :is(.recovery-ring span,.ring-empty,.dashboard-pathway>div,.dashboard-pathway small){color:var(--ws-muted)}
+html[data-theme=dark] .app .dashboard-pathway strong{color:var(--ws-ink)}
+html[data-theme=dark] .app .progress-track{background:var(--ws-line)}
+html[data-theme=dark] .app .volume-chart{background-image:repeating-linear-gradient(to top,#374a39 0,#374a39 1px,transparent 1px,transparent 25%)}
+html[data-theme=dark] .app :is(.heat-cell.level-0,.heatmap-legend .level-0){background:var(--ws-soft);border-color:var(--ws-line)}
+html[data-theme=dark] .app .heat-cell.future{background:transparent;border-color:#496044}
+html[data-theme=dark] .app .area-impact-panel{background:var(--ws-surface);color:var(--ws-ink);border-color:var(--ws-line)}
+html[data-theme=dark] .app .area-impact-panel thead{background:var(--ws-soft);color:var(--ws-muted)}
+html[data-theme=dark] .app :is(.area-heat h3,.area-heat dd,.area-impact-panel td){color:var(--ws-ink)}
+html[data-theme=dark] .app :is(.area-heat dt,.area-impact-panel th){color:var(--ws-muted)}
+
+.app input[type=file]{background:var(--ws-control)!important;color:var(--ws-ink)!important;border-color:var(--ws-line)!important}
