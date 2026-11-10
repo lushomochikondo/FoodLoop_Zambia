@@ -1,0 +1,9 @@
+﻿<section class="editor-section">
+<h2>Road access near pickup</h2>
+<p>Describe the final approach to the collection point, anywhere in Zambia. These are your observations, not a road inspection. Leave unknown details blank. Access reports are shared after acceptance.</p>
+<div class="field-grid">
+{% for field in form %}{% if field.name == 'access_surface' or field.name == 'access_condition' or field.name == 'access_notes' %}
+<div class="field full-width"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}</div>
+{% endif %}{% endfor %}
+</div>
+</section>

@@ -41,8 +41,8 @@ class ListingForm(forms.ModelForm):
     safety_acknowledged = forms.BooleanField(label='I confirm that the food information is accurate. FoodLoop does not inspect or certify food; I remain responsible for describing it honestly.')
     class Meta:
         model = Listing
-        fields = ['photo', 'name', 'quantity', 'unit', 'pathway', 'condition', 'area', 'address', 'deadline', 'notes', 'safety_acknowledged', 'pickup_latitude', 'pickup_longitude']
-        widgets = {'deadline': forms.DateTimeInput(format='%Y-%m-%dT%H:%M', attrs={'type': 'datetime-local', 'step': '60'}), 'notes': forms.Textarea(attrs={'rows': 3})}
+        fields = ['photo', 'name', 'quantity', 'unit', 'pathway', 'condition', 'area', 'address', 'deadline', 'notes', 'safety_acknowledged', 'pickup_latitude', 'pickup_longitude', 'share_pickup_pin', 'access_surface', 'access_condition', 'access_notes']
+        widgets = {'deadline': forms.DateTimeInput(format='%Y-%m-%dT%H:%M', attrs={'type': 'datetime-local', 'step': '60'}), 'notes': forms.Textarea(attrs={'rows': 3}), 'access_notes': forms.Textarea(attrs={'rows': 3})}
         labels = {'deadline': 'Collection deadline (CAT, UTC+2)', 'address': 'Exact pickup address (private until acceptance)'}
 
     def __init__(self, *args, **kwargs):
@@ -67,6 +67,16 @@ class ListingForm(forms.ModelForm):
         elif not self.is_bound:
             suggested = (now + timedelta(days=1)).replace(hour=12, minute=0, second=0, microsecond=0)
             self.initial['deadline'] = suggested.replace(tzinfo=None)
+
+    def save(self, commit=True):
+        listing = super().save(commit=False)
+        report_fields = {'access_surface', 'access_condition', 'access_notes'}
+        if report_fields.intersection(self.changed_data):
+            listing.access_reported_at = timezone.now() if any(getattr(listing, name) for name in report_fields) else None
+        if commit:
+            listing.save()
+            self.save_m2m()
+        return listing
 
     def clean_deadline(self):
         deadline = self.cleaned_data['deadline']

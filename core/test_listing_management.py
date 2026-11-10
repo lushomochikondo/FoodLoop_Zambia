@@ -29,7 +29,7 @@ class ListingManagementTests(TestCase):
             self.assertEqual(response.status_code,302)
             self.assertFalse(Listing.objects.filter(pk=self.listing.pk).exists())
             self.assertFalse(storage.exists(photo))
-            self.assertTrue(AuditLog.objects.filter(action__contains='deleted by provider').exists())
+            self.assertTrue(AuditLog.objects.filter(action__contains='deleted by donor').exists())
 
     def test_withdrawn_listing_can_be_deleted(self):
         self.listing.status='withdrawn';self.listing.save()

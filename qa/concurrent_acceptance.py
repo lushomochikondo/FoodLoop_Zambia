@@ -13,7 +13,7 @@ with TemporaryDirectory(prefix='foodloop-concurrency-') as directory:
     if '--postgres' not in sys.argv:
         os.environ.pop('POSTGRES_DB', None)
     os.environ['FOODLOOP_SQLITE_PATH'] = str(Path(directory) / 'race.sqlite3')
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'config.settings' if '--postgres' in sys.argv else 'config.test_settings'
     import django
     django.setup()
     from django.contrib.auth.models import User
@@ -23,6 +23,9 @@ with TemporaryDirectory(prefix='foodloop-concurrency-') as directory:
     from django.utils import timezone
     from core.models import Listing, Membership, Organisation
     from core.services import request_food, change_request
+    if '--postgres' not in sys.argv:
+        assert connections['default'].settings_dict['ENGINE'] == 'django.db.backends.sqlite3'
+        assert Path(connections['default'].settings_dict['NAME']).resolve() == (Path(directory) / 'race.sqlite3').resolve()
     call_command('migrate', verbosity=0)
     provider = Organisation.objects.create(name='Race provider', role='provider', status='approved', area='Lusaka')
     owner = User.objects.create(username='race-owner')

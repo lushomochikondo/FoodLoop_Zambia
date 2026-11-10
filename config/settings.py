@@ -153,3 +153,6 @@ if not DEBUG:
             CSRF_TRUSTED_ORIGINS.append('https://' + os.environ['VERCEL_PROJECT_PRODUCTION_URL'].split(':', 1)[0])
     if os.environ.get('DJANGO_TRUST_PROXY') == '1' or os.environ.get('VERCEL') == '1':
         SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Public, best-effort pilot router; replace with a dedicated service before scaling.
+ROUTING_BASE_URL = os.environ.get('ROUTING_BASE_URL', 'https://routing.openstreetmap.de')

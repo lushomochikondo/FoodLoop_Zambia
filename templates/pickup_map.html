@@ -1,0 +1,13 @@
+{% load static %}
+<section class="editor-section">
+<h2>Choose the collection point</h2>
+<p>Choose a collection point anywhere in Zambia. Pin the entrance where collections take place. You can select it on the map or enter coordinates. Opening the map loads map tiles from OpenStreetMap.</p>
+<button type="button" class="quiet" data-open-pickup-map>Choose pickup point on map</button>
+<div data-pickup-map-panel hidden>
+<label>Jump to a town or city<select data-pickup-town><option value="">All Zambia</option><option value="-15.4167,28.2833">Lusaka</option><option value="-14.4469,28.4464">Kabwe</option><option value="-12.9587,28.6366">Ndola</option><option value="-12.8024,28.2132">Kitwe</option><option value="-17.8419,25.8543">Livingstone</option><option value="-13.6333,32.6500">Chipata</option><option value="-10.2117,31.1808">Kasama</option><option value="-10.5414,32.0816">Chinsali</option><option value="-11.1998,28.8943">Mansa</option><option value="-12.1688,26.3894">Solwezi</option><option value="-15.2484,23.1274">Mongu</option></select></label>
+<button type="button" class="quiet" data-zambia-overview>Show all Zambia</button><p class="muted">Town shortcuts move the map only. Tap the actual collection entrance to set the pin. You can pan and zoom to any other location.</p><div class="pickup-map" data-pickup-map role="region" aria-label="Select pickup location"></div>
+<div class="route-fields"><label>Pickup latitude<input type="number" data-pin-lat min="-90" max="90" step="any"></label><label>Pickup longitude<input type="number" data-pin-lon min="-180" max="180" step="any"></label></div><button type="button" class="quiet" data-apply-pin>Use these coordinates</button></div>
+<p class="muted">The exact pin stays private until acceptance unless you enable “Share pickup pin” above. Otherwise, eligible organisations see only an approximate area for journey planning. <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener noreferrer">Report a map issue</a>.</p>
+</section>
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}"><link rel="stylesheet" href="{% static 'routing.css' %}">
+<script src="{% static 'vendor/leaflet/leaflet.js' %}" defer></script><script src="{% static 'pickup-map.js' %}" defer></script>

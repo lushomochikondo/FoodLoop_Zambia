@@ -96,6 +96,12 @@ class Listing(models.Model):
     address = models.CharField(max_length=240)
     pickup_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     pickup_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    share_pickup_pin = models.BooleanField(default=False, help_text='Allow eligible organisations to see the exact pickup pin before requesting. The written address and phone remain private until acceptance.')
+    access_surface = models.CharField('Pickup access road surface', max_length=20, blank=True, choices=[('', 'Unknown / not reported'), ('asphalt', 'Tarred / asphalt / bituminous'), ('gravel', 'Gravel'), ('dirt', 'Dirt / earth'), ('concrete', 'Concrete'), ('paved', 'Other paved surface'), ('mixed', 'Mixed surfaces')])
+    access_condition = models.CharField('Pickup access road condition', max_length=20, blank=True, choices=[('', 'Unknown / not reported'), ('good', 'Good'), ('fair', 'Fair'), ('rough', 'Rough'), ('very_rough', 'Very rough'), ('impassable', 'Currently impassable')])
+    access_notes = models.CharField('Pickup access notes', max_length=600, blank=True, help_text='Describe the final approach, potholes, wet-weather access or vehicle requirements. Shared after acceptance. Example: final 600 m is gravel and becomes muddy after rain.')
+    access_reported_at = models.DateTimeField(null=True, blank=True, editable=False)
+
     notes = models.TextField(blank=True)
     deadline = models.DateTimeField()
     safety_acknowledged = models.BooleanField(default=False)

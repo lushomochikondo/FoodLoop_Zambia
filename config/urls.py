@@ -4,6 +4,7 @@ from django.urls import path
 from core.authentication import UsernameOrEmailAuthenticationForm
 from core import views
 from core import public_pages
+from core.routing import collection_route
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import FileResponse
@@ -22,6 +23,7 @@ urlpatterns += [
     path('contact/',public_pages.contact,name='contact'),
     path('welcome/', views.landing_page, name='landing_page'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('listings/<int:pk>/route/', collection_route, name='collection_route'),
     path('listings/nearby/', views.nearby_listings, name='nearby_listings'),
     path('requests/', views.collections, name='collections'),
     path('beneficiary/eligibility/', views.beneficiary_eligibility, name='beneficiary_eligibility'),

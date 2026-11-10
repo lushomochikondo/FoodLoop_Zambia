@@ -1,5 +1,27 @@
 # Render testing deployment
 
+## Hosted testing status (9 November 2026)
+
+- App: https://foodloop-zambia.onrender.com
+- Render service: `foodloop-zambia`, free plan, Oregon, tracking `master`.
+- Database: Neon project `neon-yellow-ladder` (`lively-darkness-17241400`).
+- Initial deployment applied the Django migrations. Local users and records were
+  not copied to the hosted database.
+- HTTPS login, signup, admin login and five static assets returned HTTP 200.
+- Image uploads initially returned HTTP 500. Render's six storage variables were
+  updated from the locally verified working configuration. After redeploying,
+  an unpublished admin draft image uploaded successfully and its signed image URL
+  returned HTTP 200. The diagnostic draft and image were removed.
+- Email remains disabled; an external scheduler and authenticated upload/workflow
+  verification are still outstanding.
+- The unused `neon-champagne-castle` project (`divine-unit-28363931`) has no
+  FoodLoop tables, users or organizations. Deletion through Neon was rejected
+  because its organization is managed by Vercel; remove it through Vercel.
+- The existing 72-test local suite reported four failures and two errors:
+  signup expectations differ from the eligibility flow, an audit assertion expects
+  “provider” where the implementation uses “donor”, and a photo test assumes a
+  filesystem path while local settings select object storage.
+
 The root `render.yaml` provisions one free Python web service. It uses existing
 PostgreSQL and S3-compatible storage; it does not create a database or paid worker.
 
@@ -53,3 +75,7 @@ Expect slow first visits. Keep the existing external database: Render's free
 PostgreSQL expires after 30 days. No custom domain is required for initial testing.
 
 References: https://render.com/docs/free and https://render.com/docs/blueprint-spec
+
+## 10 November release preparation
+
+The collection route planner, nationwide Zambia map controls and donor road-access reports are ready for the hosted testing release. The isolated suite passes 98 tests; mobile and desktop browser checks pass, including a Kasama listing and acceptance privacy. Production static collection is checked separately. Migrations 0023 and 0024 must be applied by the existing startup command. Existing records default to private pins and unknown road access. Automatic whole-route surface analysis is not included. Email delivery and the external job scheduler remain separate operational work.

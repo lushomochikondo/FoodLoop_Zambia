@@ -5,6 +5,9 @@ from .models import AuditLog, BeneficiaryApplication, Membership, Notification, 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
 class SignupTests(TestCase):
+    def setUp(self):
+        self.client.post('/beneficiary/eligibility/', {'programme_type': 'community_kitchen', 'accepted': 'on'})
+
     def data(self, **updates):
         data={'username':'newmember','email':'member@example.invalid','password1':'New-account-password-42','password2':'New-account-password-42','organisation_name':'New Demo Kitchen','account_type':'recipient','contact_name':'Demo Member','phone':'DEMO CONTACT','area':'Lusaka Central','physical_address':'Fictional demo address','registration_reference':'','activity_description':'Community meals','handling_capacity':'Cold storage and safe containers','terms_accepted':'on'}
         data.update(updates)
@@ -16,15 +19,15 @@ class SignupTests(TestCase):
         self.assertContains(response,'/signup/')
         self.assertEqual(self.client.get('/signup/').status_code,200)
 
-    def test_recipient_signup_creates_pending_organisation_and_session(self):
+    def test_recipient_signup_creates_draft_organisation_and_session(self):
         admin=User.objects.create_user('supervisor',is_staff=True)
         response=self.client.post('/signup/',self.data())
-        self.assertRedirects(response,'/')
+        self.assertRedirects(response,'/beneficiary/application/')
         user=User.objects.get(username='newmember')
         self.assertTrue(user.check_password('New-account-password-42'))
         self.assertFalse(user.is_staff); self.assertFalse(user.is_superuser)
         org=user.membership.organisation
-        self.assertEqual(org.status,'pending'); self.assertEqual(org.role,'recipient'); self.assertEqual(org.pathway,'human')
+        self.assertEqual(org.status,'draft'); self.assertEqual(org.role,'recipient'); self.assertEqual(org.pathway,'human')
         self.assertEqual(org.contact_email,'member@example.invalid')
         self.assertTrue(org.terms_accepted)
         self.assertTrue(AuditLog.objects.filter(actor=user).exists())
@@ -60,7 +63,7 @@ class SignupTests(TestCase):
         self.client.post('/signup/',self.data(is_staff='on',is_superuser='on',status='approved',role='administrator',pathway='feed'))
         user=User.objects.get(username='newmember')
         self.assertFalse(user.is_staff); self.assertFalse(user.is_superuser)
-        self.assertEqual(user.membership.organisation.status,'pending')
+        self.assertEqual(user.membership.organisation.status,'draft')
         self.assertEqual(user.membership.organisation.pathway,'human')
         self.client.logout()
         response=self.client.post('/signup/',self.data(username='badrole',organisation_name='Bad role',account_type='admin'))
@@ -95,6 +98,12 @@ class SignupTests(TestCase):
                 self.client.post('/signup/',self.data(username='rollback',organisation_name='Rollback organisation'))
         self.assertFalse(User.objects.filter(username='rollback').exists())
         self.assertFalse(Organisation.objects.filter(name='Rollback organisation').exists())
+
+    def test_recipient_cannot_skip_eligibility(self):
+        client = Client()
+        response = client.post('/signup/?type=recipient', self.data())
+        self.assertRedirects(response, '/beneficiary/eligibility/')
+        self.assertFalse(User.objects.filter(username='newmember').exists())
 
     def test_csrf_is_required(self):
         client=Client(enforce_csrf_checks=True)

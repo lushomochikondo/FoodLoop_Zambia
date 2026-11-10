@@ -352,7 +352,9 @@ def detail(request, pk):
     history = listing.requests.select_related('recipient').prefetch_related('events')
     if org and not provider: history = history.filter(recipient=org)
     form.fields['quantity'].widget.attrs.update({'max': str(listing.remaining), 'step':'0.01'})
-    return render(request, 'detail.html', {'org':org,'listing': listing, 'form': form, 'show_private': provider or accepted or request.user.is_staff, 'can_request': org and org.role != 'provider' and org.status == 'approved' and listing.available, 'is_provider': provider, 'can_edit': provider and listing.available and listing.allocated == 0, 'can_delete':provider and org.status == 'approved' and listing.status != 'deleted', 'can_flag': org and org.role != 'provider' and org.status == 'approved', 'history': history, 'requests':history,'return_to_listing':True,'flag_form': FlagForm()})
+    from .routing import destination_for
+    route_destination = destination_for(listing, request.user, org) if request.user.is_staff or (org and org.status == 'approved') else None
+    return render(request, 'detail.html', {'route_destination':route_destination, 'org':org,'listing': listing, 'form': form, 'show_private': provider or accepted or request.user.is_staff, 'can_request': org and org.role != 'provider' and org.status == 'approved' and listing.available, 'is_provider': provider, 'can_edit': provider and listing.available and listing.allocated == 0, 'can_delete':provider and org.status == 'approved' and listing.status != 'deleted', 'can_flag': org and org.role != 'provider' and org.status == 'approved', 'history': history, 'requests':history,'return_to_listing':True,'flag_form': FlagForm()})
 
 @login_required
 @require_POST

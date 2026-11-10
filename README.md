@@ -59,3 +59,9 @@ The app now includes PWA installation assets, private production photo delivery,
 ## Verification artifacts
 
 See `docs/VERIFICATION_RESULTS.md` for the final measured results: the 42-test suite on SQLite and PostgreSQL, 372 Edge/Firefox/WebKit layout checks, 48 automated A/AA scans, local load timings, PWA installability, protected photo delivery, and production-mode checks. The optional Playwright/axe QA assets and browser recordings are development artifacts and are not shipped in the source-only release.
+
+### Isolated regression tests
+
+Run `python manage.py test --settings=config.test_settings --noinput`. These settings use temporary SQLite and local photo storage, avoiding database and object-storage connections from local deployment configuration. The concurrency subprocess also uses its own temporary SQLite database.
+
+Pickup maps open on Zambia and provide shortcuts across all ten provinces. Route maps also offer a Show all Zambia control. Donors can optionally report the surface, condition and access notes for the final approach. Reports show their last update time and remain private until acceptance; they are donor observations, not live road-condition data or whole-route surface analysis. Apply database migrations before releasing these fields. Run `python qa/routing_browser_check.py` for isolated desktop/mobile map and road-access checks.

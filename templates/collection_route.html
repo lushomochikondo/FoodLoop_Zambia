@@ -1,0 +1,27 @@
+{% load static %}
+{% if user.is_staff or org.status == 'approved' %}
+<section class="route-planner" data-route-planner data-endpoint="{% url 'collection_route' listing.pk %}">
+{% csrf_token %}
+<p class="eyebrow">PLAN YOUR COLLECTION</p><h2>Can you make the journey?</h2>
+{% if route_destination %}
+{{ route_destination|json_script:'route-destination' }}
+<p>{% if route_destination.exact %}Directions use the donor's pickup pin.{% else %}Before acceptance, this preview ends near the collection area (approximately 1 km precision). The exact private pickup pin is revealed after acceptance, unless the donor chooses to share it earlier.{% endif %}</p>
+<p class="muted">Opening the map shares viewed map areas with OpenStreetMap. Calculating a route sends your chosen starting point and the displayed destination to the routing provider. Your live position is not shared with the donor.</p>
+<button type="button" data-open-route>Open route planner</button>
+<div data-route-controls hidden>
+<div class="route-toolbar"><button type="button" class="quiet" data-origin-gps>Use my location</button><button type="button" class="quiet" data-origin-map>Choose start on map</button><button type="button" class="quiet" data-route-zambia>Show all Zambia</button></div>
+<p class="muted">Choose any starting point in Zambia by tapping the map, or enter coordinates below. Use Show all Zambia to explore other provinces.</p>
+<div class="route-fields"><label>Start latitude<input data-origin-lat type="number" min="-90" max="90" step="any" placeholder="e.g. -15.4167"></label><label>Start longitude<input data-origin-lon type="number" min="-180" max="180" step="any" placeholder="e.g. 28.2833"></label>
+<label>Travel mode<select data-route-mode><option value="driving">Driving</option><option value="walking">Walking</option><option value="cycling">Cycling</option></select></label>
+<label>Prefer<select data-route-preference><option value="distance">Shortest distance available</option><option value="duration">Fastest estimated route</option></select></label></div>
+<div class="route-map" data-route-map role="region" aria-label="Collection route map"></div>
+<div class="route-toolbar"><button type="button" data-calculate-route>Compare routes</button><button type="button" class="quiet" data-live-route aria-pressed="false">Start live location</button></div>
+<p data-route-status role="status" aria-live="polite">Select your starting point to compare routes.</p>
+<div data-route-results></div><details data-route-steps hidden><summary>Route instructions</summary><ol></ol></details>
+<div class="route-toolbar"><a data-google-route class="button quiet" target="_blank" rel="noopener noreferrer">Open Google Maps</a><a data-osm-route class="button quiet" target="_blank" rel="noopener noreferrer">Open OpenStreetMap</a></div>
+<p class="muted">Shortest means shortest among the routes returned, not a guaranteed global optimum. Estimates exclude live traffic, loading time and road-condition checks. Fuel savings are not guaranteed. Confirm transport, capacity and safe handling with the donor. <a href="https://www.openstreetmap.org/fixthemap" target="_blank" rel="noopener noreferrer">Report a map issue</a>.</p>
+</div>
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}"><link rel="stylesheet" href="{% static 'routing.css' %}">
+<script src="{% static 'vendor/leaflet/leaflet.js' %}" defer></script><script src="{% static 'routing.js' %}" defer></script>
+{% else %}<p>The donor has not added a pickup pin. Ask the donor to add one before planning directions.</p>{% endif %}
+</section>{% endif %}

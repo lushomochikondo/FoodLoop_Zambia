@@ -1,0 +1,10 @@
+{% load static %}<link rel="stylesheet" href="{% static 'routing.css' %}">
+﻿<section class="route-planner pickup-access">
+<h2>Road access near pickup</h2>
+{% if show_private %}
+<dl class="pickup-access-facts"><dt>Surface</dt><dd>{{ listing.get_access_surface_display|default:'Unknown / not reported' }}</dd><dt>Condition</dt><dd>{{ listing.get_access_condition_display|default:'Unknown / not reported' }}</dd></dl>
+{% if listing.access_notes %}<p>{{ listing.access_notes|linebreaksbr }}</p>{% endif %}
+{% if listing.access_reported_at %}<p class="muted">Donor reported &middot; Updated {{ listing.access_reported_at|date:'d M Y, H:i' }} CAT. Conditions may have changed. Confirm current access with the donor before travel.</p>{% else %}<p class="muted">The donor has not reported road access conditions.</p>{% endif %}
+<p class="muted">This report covers pickup access, not the whole route. A tarred surface does not guarantee good condition.</p>
+{% else %}<p>The donor's road access report is shared after your collection request is accepted.</p>{% endif %}
+</section>
