@@ -67,6 +67,7 @@ TIME_ZONE = 'Africa/Lusaka'
 USE_TZ = True
 LANGUAGE_CODE = 'en-gb'
 STATIC_URL = 'static/'
+WHITENOISE_MIMETYPES = {'.webmanifest': 'application/manifest+json'}
 MEDIA_ROOT = Path(os.environ.get('DJANGO_MEDIA_ROOT', str(BASE_DIR / 'media')))
 MEDIA_URL = '/media/'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024

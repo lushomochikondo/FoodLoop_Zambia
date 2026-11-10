@@ -2,7 +2,7 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import F, Q, Sum
+from django.db.models import F, Q, Sum, OuterRef, Subquery
 from django.db import transaction
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -22,6 +22,7 @@ from django.core.management import call_command
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.cache import never_cache
 from .forms import BeneficiaryApplicationForm, BeneficiaryEligibilityForm, CollectionNotesForm, DecisionForm, FlagForm, ListingForm, PreferencesForm, ProfileForm, RequestForm
 from .forms import SignupForm, StorySubmissionForm
 from .models import AuditLog, BeneficiaryApplication, FlagReport, FoodRequest, Listing, Notification, Organisation, PATHWAYS, PlatformSetting, StorySubmission
@@ -151,7 +152,8 @@ def beneficiary_document(request, pk, kind):
     return FileResponse(evidence.open('rb'), as_attachment=True, filename=evidence.name.rsplit('/', 1)[-1])
 
 def visible(user):
-    listings = Listing.objects.select_related('provider')
+    collected = FoodRequest.objects.filter(listing_id=OuterRef('pk'), status='collected').values('listing_id').annotate(total=Sum('quantity')).values('total')[:1]
+    listings = Listing.objects.select_related('provider').annotate(_collected_total=Subquery(collected))
     if user.is_staff: return listings
     org = organisation(user)
     if org.role == 'provider': return listings.filter(provider=org)
@@ -702,3 +704,22 @@ def test_phone_notification(request):
         return JsonResponse({'error': 'Wait 30 seconds before sending another test.'}, status=429)
     Notification.objects.create(user=request.user, message='Your FoodLoop phone notification test. If this appeared in your phone notification tray, alerts are working.')
     return JsonResponse({'queued': True})
+
+
+@login_required
+@require_GET
+@never_cache
+def listing_stock(request):
+    try:
+        ids = list(dict.fromkeys(int(value) for value in request.GET.get('ids', '').split(',') if value))
+        if len(ids) > 300 or any(value < 1 or value > 9223372036854775807 for value in ids):
+            raise ValueError
+    except ValueError:
+        return JsonResponse({'error': 'Select up to 300 valid listings.'}, status=400)
+    listings = visible(request.user).filter(pk__in=ids)
+    return JsonResponse({'listings': [{
+        'id': listing.pk, 'available': listing.available,
+        'remaining': str(listing.remaining), 'reserved': str(listing.reserved_quantity),
+        'collected': str(listing.collected_quantity), 'status': listing.display_status,
+        'status_key': listing.status_key,
+    } for listing in listings]})

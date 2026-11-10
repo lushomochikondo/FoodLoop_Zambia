@@ -1,0 +1,8 @@
+﻿<dl class="stock-summary" data-stock-detail data-stock-initially-available="{{ listing.available|yesno:'1,0' }}" data-stock-recipient="{% if org and org.status == 'approved' and org.role != 'provider' and not user.is_staff %}1{% else %}0{% endif %}" data-listing-id="{{ listing.pk }}" data-stock-endpoint="{% url 'listing_stock' %}">
+<div><dt>Originally listed</dt><dd>{{ listing.quantity }} {{ listing.unit }}</dd></div>
+<div><dt>Available now</dt><dd><span data-stock-remaining>{{ listing.remaining }}</span> {{ listing.unit }}</dd></div>
+<div><dt>Reserved for collection</dt><dd><span data-stock-reserved>{{ listing.reserved_quantity }}</span> {{ listing.unit }}</dd></div>
+<div><dt>Collection confirmed</dt><dd><span data-stock-collected>{{ listing.collected_quantity }}</span> {{ listing.unit }}</dd></div>
+</dl>
+<p class="muted">Requests reserve stock only after the donor accepts. Confirmed collections stay deducted. Cancelled reservations return to availability. Exhausted listings leave the available feed automatically; collection records remain available.</p>
+<p class="stock-update" data-stock-message role="status" aria-live="polite" hidden></p>

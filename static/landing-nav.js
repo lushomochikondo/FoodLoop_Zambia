@@ -1,5 +1,5 @@
 ﻿(() => {
-  const header = document.querySelector('#landing-header');
+  const header = document.querySelector('#landing-header, .app .masthead');
   if (!header) return;
 
   let previousY = window.scrollY;
@@ -7,7 +7,10 @@
 
   const updateHeader = () => {
     const currentY = Math.max(0, window.scrollY);
-    if (currentY <= 24) {
+    if (document.body.classList.contains('menu-open') || header.querySelector(':focus-visible')) {
+      header.classList.add('is-revealed');
+      header.classList.remove('is-hidden');
+    } else if (currentY <= 24) {
       header.classList.remove('is-revealed', 'is-hidden');
     } else if (currentY < previousY - threshold) {
       header.classList.add('is-revealed');

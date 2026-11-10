@@ -120,15 +120,27 @@ class Listing(models.Model):
     @property
     def available(self): return self.status == 'available' and self.deadline > timezone.now() and self.remaining > 0 and self.provider.status == 'approved'
     @property
+    def collected_quantity(self):
+        if hasattr(self, '_collected_total'):
+            return self._collected_total or Decimal('0')
+        return self.requests.filter(status='collected').aggregate(total=models.Sum('quantity'))['total'] or Decimal('0')
+    @property
+    def reserved_quantity(self):
+        return max(Decimal('0'), self.allocated - self.collected_quantity)
+    @property
     def display_status(self):
         if self.status != 'available': return self.get_status_display()
+        if self.remaining <= 0:
+            return 'Exhausted' if self.collected_quantity >= self.quantity else 'Fully reserved'
         if self.deadline <= timezone.now(): return 'Expired'
-        return 'Fully Allocated' if self.remaining <= 0 else 'Available'
+        return 'Available'
     @property
     def status_key(self):
         if self.status != 'available': return self.status
+        if self.remaining <= 0:
+            return 'exhausted' if self.collected_quantity >= self.quantity else 'allocated'
         if self.deadline <= timezone.now(): return 'expired'
-        return 'allocated' if self.remaining <= 0 else 'available'
+        return 'available'
     def clean(self):
         errors = {}
         if self.pathway == 'human' and self.condition == 'spoiled': errors['condition'] = 'This condition is unsuitable for human consumption.'

@@ -101,3 +101,9 @@ Leaflet tile images explicitly use strict-origin-when-cross-origin so OpenStreet
 ## Open requests for multi-purpose beneficiaries
 
 Approved beneficiaries and recovery partners can request any available recovery pathway. The organisation's main category tailors onboarding and recommendations, but does not restrict requests or donor acceptance. Each request acknowledges the listing's stated purpose, suitable handling and no resale. Suspended/unapproved accounts remain blocked; quantity, deadline, private pickup details and handover checks remain enforced. A spoiled item incorrectly classified for human consumption cannot be requested. No database migration is required.
+
+## Header, stock visibility and installation
+
+The workspace header now hides when scrolling down and reveals when scrolling up, matching the landing page, with keyboard focus and drawer access preserved. Stock uses the existing reservation ledger; collected quantities are derived from completed requests and are not deducted a second time. A private no-cache stock endpoint drives 30-second foreground updates. Exhausted or fully reserved listings leave recipient feeds automatically and their records remain available. No schema migration is required.
+
+The install button now handles a native prompt, unavailable/dismissed prompts, installed mode and manual browser instructions. Service-worker registration errors are surfaced and manifests use application/manifest+json. Normal-profile Edge installability diagnostics returned no errors; browser tests simulate install events rather than installing on the user's OS.

@@ -24,6 +24,7 @@ urlpatterns += [
     path('welcome/', views.landing_page, name='landing_page'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('listings/<int:pk>/route/', collection_route, name='collection_route'),
+    path('listings/stock/', views.listing_stock, name='listing_stock'),
     path('listings/nearby/', views.nearby_listings, name='nearby_listings'),
     path('requests/', views.collections, name='collections'),
     path('beneficiary/eligibility/', views.beneficiary_eligibility, name='beneficiary_eligibility'),

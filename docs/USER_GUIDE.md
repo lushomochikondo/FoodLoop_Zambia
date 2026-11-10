@@ -64,3 +64,11 @@ Under Your profile, set your email address and toggle email updates. Events stil
 Providers can choose **Delete listing** on a listing's detail page, including withdrawn listings. Confirm the deletion on the next page. Unused listings and their photos are permanently deleted. Listings with request or moderation history disappear from discovery while their accountability records are retained. Active requests are cancelled and reservations released; completed collection totals remain unchanged.
 
 Recipients choose **Request food**, enter a quantity, accept the safety acknowledgement, and send the collection request. The listing's provider can then use **Accept** under **Incoming collection requests** on that listing's page or on the dashboard. After acceptance, the recipient sees private pickup details. Administrator verification and provider acceptance are separate actions.
+
+### Stock and exhausted listings
+
+A donor lists the original quantity. Pending requests do not reduce stock. Acceptance reserves the quantity, reducing what other beneficiaries can request. After the donor verifies handover and the beneficiary confirms receipt, that amount moves from Reserved to Collection confirmed without being deducted twice. Cancelled reservations return to availability. When nothing remains, the listing leaves the available feed; fully collected stock is labelled Exhausted. Listing pages show original, available, reserved and collected quantities. Open pages check stock every 30 seconds and when you return to the tab. Collection history is preserved.
+
+### Installing FoodLoop
+
+Use Install app in the footer. Supporting browsers can show a native installation prompt. If no prompt is available, the button gives browser-menu instructions; on iPhone/iPad it explains Safari Share > Add to Home Screen. In an installed standalone window the button reads App installed. Private browsing or an existing installation can affect which install options the browser offers.
