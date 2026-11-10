@@ -93,3 +93,7 @@ Donor registrations receive posting access immediately and open the listing edit
 ## Inclusive beneficiary categories and browsing
 
 Beneficiary registration includes livestock farmers and composting operators alongside human-food programmes. Each account currently has one approved recovery pathway. Animal-feed and compost applications use relevant handling and accountability fields rather than human-feeding counts or food-handler fields. Beneficiaries can browse all available pathways; collection forms and server-side requests remain limited to the approved use. Listing pins, written addresses and access reports retain their existing privacy controls. Migration 0026 records the new programme choices.
+
+## Map tile request identification
+
+Leaflet tile images explicitly use strict-origin-when-cross-origin so OpenStreetMap receives FoodLoop's origin even though the rest of the app uses Django's same-origin referrer policy. This avoids missing-referrer access blocks without exposing page paths or coordinates in the Referer header. Browser map checks mock tile responses and verify the actual outgoing Referer; they do not automate pan/zoom requests against public OSM tile servers.

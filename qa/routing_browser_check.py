@@ -4,6 +4,7 @@ import sys
 import json
 import subprocess
 import time
+import base64
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from datetime import timedelta
@@ -60,6 +61,13 @@ with TemporaryDirectory(prefix='foodloop-map-browser-') as temp:
             page = context.new_page()
             page.on('pageerror', lambda error: errors.append(str(error)))
             tile_responses = []
+            tile_referrers = []
+            # Fulfil map images locally; do not automate pan/zoom against public OSM tiles.
+            tile_png = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+afoQAAAAASUVORK5CYII=')
+            def mock_tile(route):
+                tile_referrers.append(route.request.headers.get('referer'))
+                route.fulfill(body=tile_png,content_type='image/png')
+            page.route('https://tile.openstreetmap.org/**',mock_tile)
             page.on('response', lambda response: tile_responses.append(response.status) if 'tile.openstreetmap.org/' in response.url else None)
             def login(user):
                 context.clear_cookies()
@@ -105,6 +113,7 @@ with TemporaryDirectory(prefix='foodloop-map-browser-') as temp:
                 assert page.locator('#id_pickup_latitude').input_value()
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Editor overflow at {width}'
                 page.screenshot(path=str(ROOT/f'qa/pickup-map-{width}.png'), full_page=True)
+                assert tile_referrers and all(value == base+'/' for value in tile_referrers), tile_referrers
                 print(f'{width}px donor road report and nationwide picker: coordinates, clear, map click, layout PASS', flush=True)
             # Publish from the actual editor using a pickup point in northern Zambia.
             page.locator('#id_name').fill('Kasama browser test food')
@@ -181,8 +190,10 @@ with TemporaryDirectory(prefix='foodloop-map-browser-') as temp:
             print('Accepted recipient: exact pickup pin and private address PASS', flush=True)
             assert not errors, errors
             print('Browser JavaScript errors: 0', flush=True)
-            print('Live map tiles: HTTP statuses', sorted(set(tile_responses)), flush=True)
-            assert 200 in tile_responses, 'No live map tiles loaded'
+            print('Mocked map tiles: HTTP statuses', sorted(set(tile_responses)), flush=True)
+            assert tile_referrers and all(value == base+'/' for value in tile_referrers), tile_referrers
+            print('Pickup and route tile requests include the site origin despite same-origin page policy PASS',flush=True)
+            assert 200 in tile_responses, 'No mocked map tiles loaded'
             browser.close()
     finally:
         server.terminate(); server.wait(timeout=15); connections.close_all()

@@ -16,7 +16,7 @@
     map=L.map(document.querySelector('[data-pickup-map]'));
     if(lat.value&&lon.value)map.setView([+lat.value,+lon.value],15);
     else map.fitBounds([[-18.1,21.9],[-8.1,33.8]]);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,referrerPolicy:'strict-origin-when-cross-origin',attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
     if(lat.value&&lon.value)update([+lat.value,+lon.value]);
     map.on('click',event=>update([event.latlng.lat,event.latlng.lng]));
   });

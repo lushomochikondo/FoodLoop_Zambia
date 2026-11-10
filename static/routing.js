@@ -63,7 +63,7 @@
     if(typeof L==='undefined'){get('open-route').textContent='Map unavailable. Refresh the page to retry.';return;}
     get('route-controls').hidden=false;get('open-route').hidden=true;
     map=L.map(get('route-map')).setView([destination.latitude,destination.longitude],13);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Routes: <a href="https://routing.openstreetmap.de/about.html">FOSSGIS / OSRM</a>'}).addTo(map);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,referrerPolicy:'strict-origin-when-cross-origin',attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · Routes: <a href="https://routing.openstreetmap.de/about.html">FOSSGIS / OSRM</a>'}).addTo(map);
     L.circleMarker([destination.latitude,destination.longitude],{radius:10,color:'#163e2d',fillColor:'#1f5e3b',fillOpacity:1}).addTo(map).bindPopup(destination.exact?'Pickup point':'Approximate collection area');
     if(!destination.exact)L.circle([destination.latitude,destination.longitude],{radius:1000,color:'#1f5e3b',fillOpacity:.08}).addTo(map);
     map.on('click',event=>{stopLive();setOrigin([event.latlng.lat,event.latlng.lng]);status.textContent='Starting point selected. Press Compare routes.';});
