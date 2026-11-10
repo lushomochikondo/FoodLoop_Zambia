@@ -24,10 +24,12 @@ def build_notification_email(note):
     message.attach_alternative(render_to_string('emails/notification.html', context), 'text/html')
     return message
 
-def claim_next():
+def claim_next(notification_ids=None):
     now = timezone.now()
     with transaction.atomic():
         query = Notification.objects.filter(email_sent_at__isnull=True, email_skipped_at__isnull=True).filter(Q(email_next_retry_at__isnull=True)|Q(email_next_retry_at__lte=now)).filter(Q(email_claim_expires_at__isnull=True)|Q(email_claim_expires_at__lte=now)).order_by('created','pk')
+        if notification_ids is not None:
+            query = query.filter(pk__in=notification_ids)
         query = query.select_for_update(skip_locked=True) if connection.features.has_select_for_update_skip_locked else query.select_for_update()
         note = query.first()
         if note is None: return None
@@ -50,11 +52,11 @@ def claim_next():
         note.save(update_fields=['email_claim_token','email_claim_expires_at','email_attempts','email_last_attempt_at'])
         return note
 
-def deliver_pending(limit=200):
+def deliver_pending(limit=200, notification_ids=None):
     result = {'sent':0,'failed':0,'skipped':0,'disabled':not settings.EMAIL_NOTIFICATIONS_ENABLED}
     if result['disabled']: return result
     for _ in range(limit):
-        note = claim_next()
+        note = claim_next(notification_ids)
         if note is None: break
         if note == 'skipped': result['skipped'] += 1; continue
         try:

@@ -5,7 +5,7 @@ from django.utils import timezone
 from .models import Notification, PushDelivery, PushSubscription
 
 
-def deliver_push(limit=200):
+def deliver_push(limit=200, notification_ids=None):
     result={'sent':0,'failed':0,'disabled':not settings.WEB_PUSH_ENABLED}
     if result['disabled']:
         return result
@@ -18,6 +18,8 @@ def deliver_push(limit=200):
     subscriptions=PushSubscription.objects.select_related('user').all()
     for subscription in subscriptions:
         notes=Notification.objects.filter(user=subscription.user,created__gte=cutoff).order_by('created','pk')
+        if notification_ids is not None:
+            notes = notes.filter(pk__in=notification_ids)
         for note in notes.iterator():
             if result['sent']+result['failed']>=limit:
                 return result
@@ -27,7 +29,7 @@ def deliver_push(limit=200):
             payload={'title':'FoodLoop Zambia','body':note.message,'url':f'/listings/{note.listing_id}/' if note.listing_id else '/notifications/'}
             delivery.attempts+=1
             try:
-                webpush(subscription_info={'endpoint':subscription.endpoint,'keys':{'p256dh':subscription.p256dh,'auth':subscription.auth}},data=json.dumps(payload),vapid_private_key=settings.WEB_PUSH_PRIVATE_KEY,vapid_claims={'sub':settings.WEB_PUSH_SUBJECT},ttl=86400)
+                webpush(subscription_info={'endpoint':subscription.endpoint,'keys':{'p256dh':subscription.p256dh,'auth':subscription.auth}},data=json.dumps(payload),vapid_private_key=settings.WEB_PUSH_PRIVATE_KEY,vapid_claims={'sub':settings.WEB_PUSH_SUBJECT},ttl=86400,timeout=10)
             except WebPushException as exc:
                 status=getattr(getattr(exc,'response',None),'status_code',None)
                 if status in (404,410):

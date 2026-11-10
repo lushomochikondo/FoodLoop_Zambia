@@ -679,3 +679,17 @@ def remove_push_subscription(request):
     except (ValueError,KeyError,TypeError): return JsonResponse({'error':'The phone subscription is invalid.'},status=400)
     PushSubscription.objects.filter(user=request.user,endpoint=endpoint).delete()
     return JsonResponse({'removed':True})
+
+
+@login_required
+@require_POST
+def test_phone_notification(request):
+    if not settings.WEB_PUSH_ENABLED:
+        return JsonResponse({'error': 'Phone notifications are not configured yet.'}, status=503)
+    if not PushSubscription.objects.filter(user=request.user).exists():
+        return JsonResponse({'error': 'Enable phone notifications on this device first.'}, status=409)
+    from django.core.cache import cache
+    if not cache.add(f'push-test-{request.user.pk}', True, 30):
+        return JsonResponse({'error': 'Wait 30 seconds before sending another test.'}, status=429)
+    Notification.objects.create(user=request.user, message='Your FoodLoop phone notification test. If this appeared in your phone notification tray, alerts are working.')
+    return JsonResponse({'queued': True})

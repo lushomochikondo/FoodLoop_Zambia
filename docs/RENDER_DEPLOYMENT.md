@@ -79,3 +79,9 @@ References: https://render.com/docs/free and https://render.com/docs/blueprint-s
 ## 10 November release preparation
 
 The collection route planner, nationwide Zambia map controls and donor road-access reports are ready for the hosted testing release. The isolated suite passes 98 tests; mobile and desktop browser checks pass, including a Kasama listing and acceptance privacy. Production static collection is checked separately. Migrations 0023 and 0024 must be applied by the existing startup command. Existing records default to private pins and unknown road access. Automatic whole-route surface analysis is not included. Email delivery and the external job scheduler remain separate operational work.
+
+## Phone notifications and approval email
+
+Phone notification controls require both the workspace and push context processors. Configure WEB_PUSH_PUBLIC_KEY and WEB_PUSH_PRIVATE_KEY as a matching VAPID key pair in Render; WEB_PUSH_SUBJECT can be the HTTPS app URL. Notification creation now attempts targeted delivery after commit. Failed attempts remain queued for the authenticated scheduled job to retry. A user must open Notifications, enable phone alerts on their own device, and grant browser/OS permission. Send test phone alert checks the same server delivery path. iPhone users need a supported Home Screen web app.
+
+Approval emails remain disabled until a working sender is configured. On Render free use EMAIL_BACKEND=core.email_backends.ResendEmailBackend, RESEND_API_KEY, DEFAULT_FROM_EMAIL with a provider-verified sender, PUBLIC_APP_URL and EMAIL_NOTIFICATIONS_ENABLED=1. Keep API keys in Render secrets. Test provider delivery before enabling for testers. Existing Gmail SMTP settings cannot use blocked SMTP ports on Render free. The queued retry scheduler still needs an external caller.

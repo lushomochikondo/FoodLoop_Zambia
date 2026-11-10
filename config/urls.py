@@ -35,6 +35,7 @@ urlpatterns += [
     path('listings/<int:pk>/delete/', views.delete_listing, name='delete_listing'),
     path('listings/<int:pk>/report/', views.report_listing, name='report_listing'),
     path('notifications/', views.notifications, name='notifications'),
+    path('notifications/push/test/', views.test_phone_notification, name='push_test'),
     path('notifications/push/subscribe/', views.save_push_subscription, name='push_subscribe'),
     path('notifications/push/unsubscribe/', views.remove_push_subscription, name='push_unsubscribe'),
     path('administration/', views.moderation, name='moderation'),
