@@ -69,7 +69,18 @@ with TemporaryDirectory(prefix='foodloop-style-',ignore_cleanup_errors=True) as 
                     assert page.locator('[data-listing-card]').count()==3
                     assert page.locator('.photo-placeholder-label').first.evaluate('el=>getComputedStyle(el).color')=='rgb(238, 240, 217)'
                     if theme=='dark':
-                        assert page.locator('select').first.evaluate('el=>getComputedStyle(el).backgroundColor')=='rgb(23, 39, 29)'
+                        assert page.locator('select').first.evaluate('el=>getComputedStyle(el).backgroundColor')=='rgb(22, 30, 35)'
+                    if role=='provider' and width==390 and theme=='dark':
+                        devtools=context.new_cdp_session(page)
+                        devtools.send('DOM.enable');devtools.send('CSS.enable')
+                        root=devtools.send('DOM.getDocument')['root']['nodeId']
+                        node=devtools.send('DOM.querySelector',{'nodeId':root,'selector':'#food-search'})['nodeId']
+                        devtools.send('CSS.forcePseudoState',{'nodeId':node,'forcedPseudoClasses':['autofill']})
+                        assert page.locator('#food-search').evaluate("el=>getComputedStyle(el).getPropertyValue('-webkit-text-fill-color')")=='rgb(239, 243, 244)'
+                        assert 'rgb(22, 30, 35)' in page.locator('#food-search').evaluate('el=>getComputedStyle(el).boxShadow')
+                        devtools.send('CSS.forcePseudoState',{'nodeId':node,'forcedPseudoClasses':[]})
+                        devtools.detach()
+                        print('Browser autofill state: light text and dark inset background PASS',flush=True)
                     assert page.locator('#theme-toggle').bounding_box()['x']<page.locator('.masthead-notifications').bounding_box()['x']
                     page.screenshot(path=str(ROOT/f'qa/workspace-{role}-{theme}-{width}.png'),full_page=True)
                     if role=='recipient':page.locator('[data-listing-card]').first.screenshot(path=str(ROOT/f'qa/listing-card-{theme}-{width}.png'))
@@ -82,7 +93,17 @@ with TemporaryDirectory(prefix='foodloop-style-',ignore_cleanup_errors=True) as 
                 assert page.evaluate('document.documentElement.dataset.theme')=='dark'
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
                 if page.locator('input[type=file]').count():
-                    assert page.locator('input[type=file]').first.evaluate('el=>getComputedStyle(el).backgroundColor')=='rgb(23, 39, 29)'
+                    assert page.locator('input[type=file]').first.evaluate('el=>getComputedStyle(el).backgroundColor')=='rgb(22, 30, 35)'
+                white_panels=page.evaluate(r"""() => [...document.querySelectorAll('main section, main article, main .empty-state, main .request-panel, main .pickup-location-capture')].filter(el=>{const r=el.getBoundingClientRect(),c=getComputedStyle(el).backgroundColor.match(/[\d.]+/g);return r.width*r.height>8000&&c&&Number(c[0])>225&&Number(c[1])>225&&Number(c[2])>225&&(c.length<4||Number(c[3])>.8)}).map(el=>el.className)""")
+                assert not white_panels,(role,path,white_panels)
+                text_input=page.locator('input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file])').first
+                if text_input.count() and text_input.is_enabled() and not text_input.get_attribute('readonly'):
+                    kind=text_input.get_attribute('type') or 'text'
+                    if kind in ('text','email','number','search'):
+                        text_input.fill('12' if kind=='number' else 'reader@example.invalid' if kind=='email' else 'Readable input text')
+                        assert text_input.evaluate("el=>getComputedStyle(el).color")== 'rgb(239, 243, 244)'
+                        assert text_input.evaluate("el=>getComputedStyle(el).getPropertyValue('-webkit-text-fill-color')")== 'rgb(239, 243, 244)'
+                        assert text_input.evaluate("el=>getComputedStyle(el).caretColor")== 'rgb(239, 243, 244)'
                 page.screenshot(path=str(ROOT / ('qa/workspace-'+role+'-dark-'+path.strip('/').replace('/','-')+'.png')),full_page=True)
             page.goto('https://foodloop.test/')
             page.set_viewport_size({'width':320,'height':800})

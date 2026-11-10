@@ -1,6 +1,6 @@
 ﻿/* Workspace colour system. Public pages keep their existing appearance. */
 .app{--ws-bg:#eeeee2;--ws-surface:#fffdf6;--ws-soft:#f1f2e8;--ws-ink:#233d2b;--ws-muted:#5d705d;--ws-line:#d9dfcf;--ws-gold:#d2b36b;--ws-control:#fafbf3;--ws-focus:#897035;--ws-shadow:0 14px 42px -24px #24452b45;color:var(--ws-ink);background:radial-gradient(ellipse at 90% 5%,#d5e2ce 0,transparent 45%),radial-gradient(ellipse at 5% 45%,#e9dfc5 0,transparent 48%),#eeeee2}
-html[data-theme=dark] .app{--ws-bg:#111e17;--ws-surface:#1b2b21;--ws-soft:#24372a;--ws-ink:#edf1e4;--ws-muted:#b2c0ac;--ws-line:#374d3a;--ws-gold:#ddc17b;--ws-control:#17271d;--ws-focus:#e7cf95;--ws-shadow:0 16px 46px -22px #0009;color-scheme:dark;background:radial-gradient(ellipse at 90% 0,#213c2b 0,transparent 48%),radial-gradient(ellipse at 5% 45%,#302e1f 0,transparent 55%),#111e17}
+html[data-theme=dark] .app{--ws-bg:#11171b;--ws-surface:#1c2429;--ws-soft:#273238;--ws-ink:#eff3f4;--ws-muted:#b8c3c9;--ws-line:#3c4951;--ws-gold:#ddc17b;--ws-control:#161e23;--ws-focus:#aad3bf;--ws-shadow:0 16px 46px -22px #0009;color-scheme:dark;background:#11171b}
 .app .app-content{background:transparent}.app main{color:var(--ws-ink)}
 .app main :is(h1,h2,h3,h4){color:var(--ws-ink)}
 .app :is(.muted,.page-subtitle,.field-help,.section-kicker,.page-path,.listing-metadata,.results-note){color:var(--ws-muted)}
@@ -110,3 +110,47 @@ html[data-theme=dark] .app :is(.area-heat h3,.area-heat dd,.area-impact-panel td
 html[data-theme=dark] .app :is(.area-heat dt,.area-impact-panel th){color:var(--ws-muted)}
 
 .app input[type=file]{background:var(--ws-control)!important;color:var(--ws-ink)!important;border-color:var(--ws-line)!important}
+
+/* Neutral dark surfaces keep the brand green as an accent, not a colour cast. */
+html[data-theme=dark] .app .masthead{background:#172923;border-color:#34473e}
+html[data-theme=dark] .app .site-footer{background:#111d18;border-top:1px solid #324039}
+html[data-theme=dark] .app .exchange-page .no-photo,
+html[data-theme=dark] .app .exchange-page [data-pathway=feed] .no-photo,
+html[data-theme=dark] .app .exchange-page [data-pathway=compost] .no-photo,
+html[data-theme=dark] .app .detail-photo .no-photo{background:linear-gradient(135deg,#2d3b43,#202b31);color:#d1dbe0}
+html[data-theme=dark] .app .exchange-page .no-photo .empty-glyph{background:#192b28;border-color:#7c927f;color:#d9c58d}
+html[data-theme=dark] .app .exchange-page .card-action{background:#a9d2b7;color:#16271d}
+html[data-theme=dark] .app .exchange-page .match-reasons b{background:#2c4439;color:#d0e6d7}
+html[data-theme=dark] .app :is(.empty-state,.application-feedback,.application-checks label,.required-checks label,.upload-zone,.delete-summary,.report-disclosure,.collection-notes-form,.notification-actions,.beneficiary-application-form .acknowledgement){background:var(--ws-surface);color:var(--ws-ink);border-color:var(--ws-line)}
+html[data-theme=dark] .app .empty-state :is(h2,h3,p,svg){color:var(--ws-muted)}
+html[data-theme=dark] .app .empty-glyph{background:var(--ws-soft);border-color:var(--ws-line);color:#bcd6c5}
+html[data-theme=dark] .app :is(.detail-facts,.request-panel,.pickup-panel,.stock-summary>div){border-color:var(--ws-line)}
+html[data-theme=dark] .app .workspace-drawer .nav-item.active{background:#2c3c35;color:#e2ece6}
+html[data-theme=dark] .app :is(.analytics-stats a,.panel-link,.pipeline-panel .panel-heading a,a.text-link){color:#b9d9c6}
+html[data-theme=dark] .app .heatmap-summary>strong{color:var(--ws-ink)}
+html[data-theme=dark] .app .volume-chart{background-image:repeating-linear-gradient(to top,#344249 0,#344249 1px,transparent 1px,transparent 25%)}
+
+/* Explicit control colours also cover browser autofill and inherited text fills. */
+html[data-theme=dark] .app :is(input,textarea,select){color:#eff3f4!important;-webkit-text-fill-color:#eff3f4!important;caret-color:#eff3f4!important;background-color:#161e23!important;border-color:#50616b!important;opacity:1}
+html[data-theme=dark] .app :is(input,textarea)::placeholder{color:#b8c3c9!important;-webkit-text-fill-color:#b8c3c9!important;opacity:1}
+html[data-theme=dark] .app :is(input,textarea,select):autofill{box-shadow:0 0 0 1000px #161e23 inset!important;-webkit-text-fill-color:#eff3f4!important;caret-color:#eff3f4!important}
+html[data-theme=dark] .app select option{background:#161e23;color:#eff3f4}
+html[data-theme=dark] .app main :is(label,legend,label span){color:#e5ecef!important}
+html[data-theme=dark] .app main :is(.field-help,.field small,.form-header p){color:#b8c3c9}
+html[data-theme=dark] .app .requests>section,
+html[data-theme=dark] .app :is(.handover-code-panel,.handover-qr-card,.qr-scan-panel,.collection-notes-form){background:var(--ws-surface);color:var(--ws-ink);border-color:var(--ws-line)}
+html[data-theme=dark] .app .exchange-page :is(.photo-pathway,.photo-pathway.feed,.photo-pathway.compost,.free-label){background:#27363e;color:#e0e9ed;border-color:#4b6069}
+html[data-theme=dark] .app .exchange-page .no-photo .empty-glyph{color:#bfd2c8;border-color:#607c70}
+html[data-theme=dark] .app .theme-toggle{color:#dce5e9}
+html[data-theme=dark] .app .exchange-page .match-reasons b{background:#2d3b35;color:#d7e4dc}
+html[data-theme=dark] .app main button:not(.quiet):not(.heat-cell):not(.route-choice):not(.danger){background:#a9d2b7;color:#15261b;border-color:#a9d2b7}
+html[data-theme=dark] .app .primary-action{background:#a9d2b7;color:#15261b;border-color:#a9d2b7}
+html[data-theme=dark] .app input::file-selector-button{background:#30453a;color:#edf4ef;border-color:#4c6658}
+
+html[data-theme=dark] .app .pickup-location-capture{background:var(--ws-soft);color:var(--ws-ink);border-color:var(--ws-line)}
+html[data-theme=dark] .app .pickup-location-capture strong{color:var(--ws-ink)}
+html[data-theme=dark] .app :is(.pickup-location-capture p,.impact-panel p,.impact-panel li span,.impact-panel .eyebrow,.upload-placeholder strong,.upload-placeholder span,.section-number){color:var(--ws-muted)}
+html[data-theme=dark] .app .site-footer .footer-column h2{color:#cbd6d1}
+html[data-theme=dark] .app .analytics-stats section .metric-glyph{background:var(--ws-soft);color:#bcd0c3;border-color:var(--ws-line)}
+html[data-theme=dark] .app .exchange-page .card-divider{background:var(--ws-line);border-color:var(--ws-line)}
+html[data-theme=dark] .app :is(input,textarea,select){color-scheme:dark!important}

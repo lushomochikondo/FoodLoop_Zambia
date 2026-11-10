@@ -111,3 +111,5 @@ The install button now handles a native prompt, unavailable/dismissed prompts, i
 ## Workspace visual refresh and themes
 
 Authenticated pages use a warm light palette or forest dark palette, refined listing cards and the existing landing hero photograph in the greeting banner. A moon/sun toggle beside the notification bell stores the device preference in localStorage; the small initialisation script applies it before styles render. Theme styles are scoped to authenticated pages. No database change or migration is required. Visual checks cover all three roles, mobile/desktop layouts, native controls, persistence, system preference, keyboard activation and cross-tab changes.
+
+Dark mode was refined to neutral charcoal surfaces after feedback about excessive green and low-contrast input text. Typed text, text-fill colour, caret and autofill now use explicit light colours. Visual checks include actual typed values and detection of leftover large white panels.
