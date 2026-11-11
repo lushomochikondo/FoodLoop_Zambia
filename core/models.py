@@ -335,5 +335,16 @@ class PushDelivery(models.Model):
     attempts = models.PositiveSmallIntegerField(default=0)
     last_error = models.CharField(max_length=120, blank=True)
     next_attempt_at = models.DateTimeField(null=True, blank=True)
+    claim_token = models.CharField(max_length=32, blank=True, default='')
+    claim_expires_at = models.DateTimeField(null=True, blank=True)
     class Meta:
         constraints = [models.UniqueConstraint(fields=['notification','subscription'], name='push_delivery_once')]
+
+
+class ScheduledJobState(models.Model):
+    name = models.CharField(max_length=80, unique=True)
+    claim_token = models.CharField(max_length=32, blank=True, default='')
+    claim_expires_at = models.DateTimeField(null=True, blank=True)
+    last_started_at = models.DateTimeField(null=True, blank=True)
+    last_completed_at = models.DateTimeField(null=True, blank=True)
+    last_error = models.CharField(max_length=160, blank=True, default='')

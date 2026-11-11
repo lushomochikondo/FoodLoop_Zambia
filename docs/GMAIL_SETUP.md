@@ -1,5 +1,7 @@
 # Gmail notification setup
 
+For the hosted Render Free service, use [Gmail API setup](GMAIL_API_SETUP.md). The SMTP instructions below apply to local development or hosts that permit Gmail SMTP connections.
+
 The notification pipeline sends a formatted HTML email plus plain-text alternative for account, request, decision, collection, moderation and deadline events. Users can turn email updates off under Your profile; signup includes the same preference. In-app notifications stay available independently.
 
 ## Connect the sender

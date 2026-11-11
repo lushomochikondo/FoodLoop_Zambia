@@ -40,6 +40,7 @@ urlpatterns += [
     path('notifications/push/subscribe/', views.save_push_subscription, name='push_subscribe'),
     path('notifications/push/unsubscribe/', views.remove_push_subscription, name='push_unsubscribe'),
     path('administration/', views.moderation, name='moderation'),
+    path('administration/system/', views.system_status, name='system_status'),
     path('impact/', views.impact, name='impact'),
     path('impact/statement/', views.impact_statement, name='impact_statement'),
     path('profile/', views.profile, name='profile'),

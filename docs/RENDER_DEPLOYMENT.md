@@ -82,6 +82,14 @@ The collection route planner, nationwide Zambia map controls and donor road-acce
 
 ## Phone notifications and approval email
 
+### 12 November operational follow-up
+
+The existing Render startup command now supervises Gunicorn and one `run_scheduler` child. It runs jobs every five minutes while the service is awake and shuts both down together. `ENABLE_BACKGROUND_JOBS=0` disables that child when an external scheduler or dedicated worker is configured. No extra paid Render resource is created. Free service sleep still stops all in-instance background work.
+
+Migration 0027 adds a database lease and heartbeat for scheduled jobs plus push-delivery claims. Job leases coordinate overlapping instances and HTTP invocations without relying on PostgreSQL session locks (which are unsuitable for transaction poolers). Push claims reduce duplicate delivery when immediate attempts overlap retries; external delivery followed by process loss can still duplicate a message.
+
+Administrators can inspect `/administration/system/` for non-secret configuration status, registered-device count, recent sending counts and the job heartbeat. A configured sender does not prove inbox delivery. Gmail HTTPS delivery and its local consent helper are documented in [GMAIL_API_SETUP.md](GMAIL_API_SETUP.md); Gmail credentials must still be authorized and installed before enabling email notifications.
+
 Phone notification controls require both the workspace and push context processors. Configure WEB_PUSH_PUBLIC_KEY and WEB_PUSH_PRIVATE_KEY as a matching VAPID key pair in Render; WEB_PUSH_SUBJECT can be the HTTPS app URL. Notification creation now attempts targeted delivery after commit. Failed attempts remain queued for the authenticated scheduled job to retry. A user must open Notifications, enable phone alerts on their own device, and grant browser/OS permission. Send test phone alert checks the same server delivery path. iPhone users need a supported Home Screen web app.
 
 Approval emails remain disabled until a working sender is configured. On Render free use EMAIL_BACKEND=core.email_backends.ResendEmailBackend, RESEND_API_KEY, DEFAULT_FROM_EMAIL with a provider-verified sender, PUBLIC_APP_URL and EMAIL_NOTIFICATIONS_ENABLED=1. Keep API keys in Render secrets. Test provider delivery before enabling for testers. Existing Gmail SMTP settings cannot use blocked SMTP ports on Render free. The queued retry scheduler still needs an external caller.

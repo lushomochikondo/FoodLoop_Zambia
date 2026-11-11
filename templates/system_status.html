@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}System status · FoodLoop{% endblock %}
+{% block content %}
+<div class="form-header"><p class="eyebrow">ADMINISTRATION</p><h1>System status.</h1><p>Check communication services before inviting partners.</p></div>
+<section class="report-panel">
+  <h2>Email updates</h2>
+  <p>{% if email_ready %}Sender configured. Confirm delivery with a real inbox test.{% else %}Setup required. Approval emails are not ready to send.{% endif %}</p>
+  <p>{{ email_sent_count }} email{{ email_sent_count|pluralize }} accepted by the sending service in the last 24 hours. This does not confirm inbox delivery.</p>
+</section>
+<section class="report-panel">
+  <h2>Phone notifications</h2>
+  <p>{% if push_ready %}Phone notification service configured.{% else %}Phone notification service needs setup.{% endif %} {{ phone_count }} registered device{{ phone_count|pluralize }}.</p>
+  <p>{{ push_sent_count }} alert{{ push_sent_count|pluralize }} accepted by the push service in the last 24 hours.</p>
+  <p>Android test: open FoodLoop in Chrome, sign in, open Notifications and choose Enable phone notifications. Allow the permission, choose Send test phone alert, then check the phone notification tray. Check Android notification settings for Chrome or the installed FoodLoop app if no alert appears.</p>
+</section>
+<section class="report-panel">
+  <h2>Automatic retries</h2>
+  <p>{% if job_state.last_completed_at %}Last successful job cycle: {{ job_state.last_completed_at|date:'d M Y, H:i' }} CAT.{% else %}No successful job cycle recorded yet.{% endif %}</p>
+  {% if job_state.last_error %}<p role="status">{{ job_state.last_error }}</p>{% endif %}
+  <p>Jobs run every five minutes while the service is awake. Render's free service can sleep; continuous delivery requires an always-on service or an external schedule.</p>
+</section>
+{% endblock %}

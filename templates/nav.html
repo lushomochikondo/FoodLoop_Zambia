@@ -1,4 +1,5 @@
 {% load static %}
+{% if user.is_staff %}<a class="nav-item" href="{% url 'system_status' %}">System status</a>{% endif %}
 <a class="nav-item {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-exchange"/></svg></span>Food exchange</a>
 <a class="nav-item {% if request.path == '/dashboard/' %}active{% endif %}" href="{% url 'dashboard' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-analytics"/></svg></span>Dashboard</a>
 <a class="nav-item {% if request.path == '/requests/' %}active{% endif %}" href="{% url 'collections' %}"><span class="nav-glyph"><svg class="premium-icon" aria-hidden="true"><use href="#p-collections"/></svg></span>Requests & collections</a>

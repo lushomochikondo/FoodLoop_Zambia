@@ -154,3 +154,18 @@ html[data-theme=dark] .app .site-footer .footer-column h2{color:#cbd6d1}
 html[data-theme=dark] .app .analytics-stats section .metric-glyph{background:var(--ws-soft);color:#bcd0c3;border-color:var(--ws-line)}
 html[data-theme=dark] .app .exchange-page .card-divider{background:var(--ws-line);border-color:var(--ws-line)}
 html[data-theme=dark] .app :is(input,textarea,select){color-scheme:dark!important}
+
+/* QA: secondary copy must remain readable on every dashboard surface. */
+.auth-header .brand small{color:#35493c}
+.app .dashboard-page :is(.exchange-heading p,.analytics-stats strong small,.chart-unit,.dashboard-pathway>div>span,.dashboard-pathway small,.pipeline-stage,.pipeline small,.activity-list p,.activity-list time){color:var(--ws-muted)}
+.app .dashboard-page .analytics-stats section:first-child strong small{color:#eff3f4}
+html[data-theme=dark] .app :is(.exchange-heading p,.section-kicker,.eyebrow,.heatmap-legend,#heatmap-detail,.profile-org-grid dt){color:var(--ws-muted)!important}
+html[data-theme=dark] .app .profile-org-grid dd{color:var(--ws-ink)}
+html[data-theme=dark] .app .activity-list article>div>a{color:#b9d9c6}
+html[data-theme=dark] .app .area-heat{background:#202b31;border-color:var(--ws-line)}
+html[data-theme=dark] .app .area-heat.level-1{background:#24352d}
+html[data-theme=dark] .app .area-heat.level-2{background:#284333}
+html[data-theme=dark] .app .area-heat.level-3{background:#31553d}
+html[data-theme=dark] .app .area-heat.level-4{background:#386044}
+html[data-theme=dark] .app .area-heat.level-5{background:#3c6a49}
+html[data-theme=dark] .app .area-heat :is(strong,span,dt,dd){color:#eff3f4}

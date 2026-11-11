@@ -1,8 +1,9 @@
 from decimal import Decimal
+from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import F, Q, Sum, OuterRef, Subquery
+from django.db.models import Count, F, Q, Sum, OuterRef, Subquery
 from django.db import transaction
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -196,13 +197,18 @@ def workspace_context(request):
             ranked.append(listing)
         cards = sorted(ranked, key=lambda item: (item.match_score is None, -(item.match_score or 0), item.deadline, item.pk))
     collected = requests.filter(status='collected')
-    kg = collected.aggregate(n=Sum('confirmed_weight_kg'))['n'] or Decimal('0')
-    human = collected.filter(listing__pathway='human').aggregate(n=Sum('confirmed_weight_kg'))['n'] or Decimal('0')
+    request_totals = requests.aggregate(
+        kg=Sum('confirmed_weight_kg', filter=Q(status='collected')),
+        **{f'{code}_kg': Sum('confirmed_weight_kg', filter=Q(status='collected', listing__pathway=code)) for code, _ in PATHWAYS},
+        **{f'{status}_count': Count('pk', filter=Q(status=status)) for status in ['pending', 'accepted', 'ready', 'collected']},
+    )
+    kg = request_totals['kg'] or Decimal('0')
+    human = request_totals['human_kg'] or Decimal('0')
     meal_weight = platform_setting('meal_weight_kg', settings.MEAL_WEIGHT_KG, Decimal)
     if meal_weight <= 0: meal_weight = Decimal('0.4')
     pathway_totals = []
     for code, label in PATHWAYS:
-        total = collected.filter(listing__pathway=code).aggregate(n=Sum('confirmed_weight_kg'))['n'] or Decimal('0')
+        total = request_totals[f'{code}_kg'] or Decimal('0')
         pathway_totals.append({'code': code, 'label': label, 'kg': total, 'percent': round(float(total / kg * 100)) if kg else 0})
     own_listings = visible(request.user)
     if org and org.role != 'provider': own_listings = own_listings.filter(pk__in=requests.values('listing_id'))
@@ -210,7 +216,7 @@ def workspace_context(request):
     closed_kg = own_listings.filter(unit='kg', deadline__lte=timezone.now()).exclude(status__in=['withdrawn', 'removed', 'deleted'])
     collected_by_listing = {row['listing_id']: row['amount'] or Decimal('0') for row in requests.filter(status='collected').values('listing_id').annotate(amount=Sum('confirmed_quantity'))}
     wasted_kg = sum((max(Decimal('0'), item.quantity-collected_by_listing.get(item.pk, Decimal('0'))) for item in closed_kg), Decimal('0'))
-    return {'org': org, 'listings': cards, 'requests': requests.order_by('-created'), 'kg': kg, 'listed_kg': listed_kg, 'wasted_kg': wasted_kg, 'availability': availability, 'meals': int(Decimal(human) / meal_weight), 'meal_weight': meal_weight, 'weight_limit': platform_setting('weight_sanity_limit_kg', settings.WEIGHT_SANITY_LIMIT_KG, int), 'area': area, 'collection_count': requests.filter(status='collected').count(), 'search': search, 'pathway': pathway, 'pathways': PATHWAYS, 'pathway_totals': pathway_totals, 'pending_count': requests.filter(status='pending').count(), 'listing_count': len(cards)}
+    return {'org': org, 'listings': cards, 'requests': requests.order_by('-created'), 'kg': kg, 'listed_kg': listed_kg, 'wasted_kg': wasted_kg, 'availability': availability, 'meals': int(Decimal(human) / meal_weight), 'meal_weight': meal_weight, 'weight_limit': platform_setting('weight_sanity_limit_kg', settings.WEIGHT_SANITY_LIMIT_KG, int), 'area': area, 'collection_count': request_totals['collected_count'], 'search': search, 'pathway': pathway, 'pathways': PATHWAYS, 'pathway_totals': pathway_totals, 'pending_count': request_totals['pending_count'], 'accepted_count': request_totals['accepted_count'], 'ready_count': request_totals['ready_count'], 'active_count': sum(request_totals[f'{status}_count'] for status in ['pending', 'accepted', 'ready']), 'listing_count': len(cards)}
 
 def landing_page(request):
     from .models import NewsArticle
@@ -270,9 +276,6 @@ def dashboard(request):
     from .models import RequestEvent
     context=workspace_context(request)
     requests=context['requests']
-    context['accepted_count']=requests.filter(status='accepted').count()
-    context['ready_count']=requests.filter(status='ready').count()
-    context['active_count']=requests.filter(status__in=['pending','accepted','ready']).count()
     context['recent_events']=RequestEvent.objects.filter(request__in=requests).select_related('request__listing','actor').order_by('-created')[:8]
     start=timezone.localdate()-timedelta(days=6)
     daily=requests.filter(status='collected',collected_at__date__gte=start).annotate(day=TruncDate('collected_at')).values('day').annotate(quantity=Sum('confirmed_weight_kg'))
@@ -321,6 +324,27 @@ def scheduled_jobs(request):
         return HttpResponseNotFound()
     call_command('run_jobs')
     return JsonResponse({'ok': True})
+
+
+@login_required
+@never_cache
+def system_status(request):
+    if not request.user.is_staff:
+        raise PermissionDenied
+    from .models import PushDelivery, ScheduledJobState
+    gmail_ready = all([settings.GMAIL_CLIENT_ID, settings.GMAIL_CLIENT_SECRET, settings.GMAIL_REFRESH_TOKEN])
+    backend_ready = (gmail_ready if settings.EMAIL_BACKEND == 'core.email_backends.GmailAPIEmailBackend'
+                     else bool(settings.RESEND_API_KEY) if settings.EMAIL_BACKEND == 'core.email_backends.ResendEmailBackend'
+                     else bool(settings.EMAIL_HOST_USER and settings.EMAIL_HOST_PASSWORD) and not settings.RENDER)
+    cutoff = timezone.now() - timedelta(hours=24)
+    return render(request, 'system_status.html', {
+        'email_ready': settings.EMAIL_NOTIFICATIONS_ENABLED and backend_ready,
+        'push_ready': settings.WEB_PUSH_ENABLED,
+        'phone_count': PushSubscription.objects.count(),
+        'email_sent_count': Notification.objects.filter(email_sent_at__gte=cutoff).count(),
+        'push_sent_count': PushDelivery.objects.filter(sent_at__gte=cutoff).count(),
+        'job_state': ScheduledJobState.objects.filter(name='notifications-and-deadlines').first(),
+    })
 
 @login_required
 def collections(request):
@@ -564,18 +588,24 @@ def impact(request):
         return response
     rows = []
     units = Listing._meta.get_field('unit').choices
+    listed_groups = {(row['pathway'], row['unit']): row['amount'] or Decimal('0')
+                     for row in listings.order_by().values('pathway', 'unit').annotate(amount=Sum('quantity'))}
+    recovered_groups = list(collections.order_by().values('listing__pathway', 'listing__unit').annotate(
+        quantity=Sum('confirmed_quantity'), weight=Sum('confirmed_weight_kg')))
+    recovered_quantities = {(row['listing__pathway'], row['listing__unit']): row['quantity'] or Decimal('0') for row in recovered_groups}
+    recovered_weights = {code: sum((row['weight'] or Decimal('0') for row in recovered_groups if row['listing__pathway'] == code), Decimal('0')) for code, _ in PATHWAYS}
     for unit, label in units:
-        rows.append({'unit': label, 'listed': listings.filter(unit=unit).aggregate(n=Sum('quantity'))['n'] or 0, 'collected': collections.filter(listing__unit=unit).aggregate(n=Sum('confirmed_quantity'))['n'] or 0})
-    kg = collections.aggregate(n=Sum('confirmed_weight_kg'))['n'] or Decimal('0')
-    human = collections.filter(listing__pathway='human').aggregate(n=Sum('confirmed_weight_kg'))['n'] or Decimal('0')
+        rows.append({'unit': label, 'listed': sum(value for (code, key), value in listed_groups.items() if key == unit), 'collected': sum(value for (code, key), value in recovered_quantities.items() if key == unit)})
+    kg = sum(recovered_weights.values(), Decimal('0'))
+    human = recovered_weights['human']
     meal_weight = platform_setting('meal_weight_kg', settings.MEAL_WEIGHT_KG, Decimal)
     meal_weight = meal_weight if meal_weight > 0 else Decimal('0.4')
-    totals = [{'label': label, 'kg': collections.filter(listing__pathway=code).aggregate(n=Sum('confirmed_weight_kg'))['n'] or Decimal('0')} for code, label in PATHWAYS]
+    totals = [{'label': label, 'kg': recovered_weights[code]} for code, label in PATHWAYS]
     pathway_rows = []
     for code, label in PATHWAYS:
         for unit, unit_label in units:
-            listed = listings.filter(pathway=code, unit=unit).aggregate(n=Sum('quantity'))['n'] or 0
-            recovered = collections.filter(listing__pathway=code, listing__unit=unit).aggregate(n=Sum('confirmed_quantity'))['n'] or 0
+            listed = listed_groups.get((code, unit), Decimal('0'))
+            recovered = recovered_quantities.get((code, unit), Decimal('0'))
             if listed or recovered: pathway_rows.append({'pathway': label, 'unit': unit_label, 'listed': listed, 'collected': recovered})
     area_rows, wasted_rows = build_area_impact_rows(listings, collections, measure)
     co2 = Decimal(kg) * Decimal(settings.CO2E_KG_PER_KG) if settings.CO2E_KG_PER_KG and settings.CO2E_SOURCE else None
