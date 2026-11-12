@@ -4,3 +4,9 @@
 .leaflet-overlay-pane svg{width:revert;height:revert;max-width:none;max-height:none;stroke:none}
 
 .pickup-access-facts{display:grid;grid-template-columns:auto 1fr;gap:8px 18px}.pickup-access-facts dt{font-weight:600}.pickup-access-facts dd{margin:0}.pickup-access p{overflow-wrap:anywhere}
+
+/* Give nationwide maps room to show useful detail without filling the screen. */
+.route-map,.pickup-map{height:clamp(420px,62vh,620px)}
+@media(max-width:600px){
+  .route-map,.pickup-map{height:clamp(340px,55vh,460px);height:clamp(340px,55svh,460px)}
+}
