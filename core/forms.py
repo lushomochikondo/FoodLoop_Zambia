@@ -13,31 +13,53 @@ from datetime import timedelta
 UPLOAD_MAX_BYTES = 4 * 1024 * 1024
 UPLOAD_MAX_MB = 4
 
+
+def prepare_listing_photo(photo):
+    if photo.size > UPLOAD_MAX_BYTES:
+        raise forms.ValidationError(f'Choose a photo smaller than {UPLOAD_MAX_MB} MB.')
+    try:
+        with Image.open(photo) as source:
+            if source.format not in {'JPEG', 'PNG', 'WEBP'}:
+                raise forms.ValidationError('Use a JPG, PNG or WebP photo.')
+            if source.width * source.height > 25_000_000:
+                raise forms.ValidationError('Choose a photo smaller than 25 megapixels.')
+            image = ImageOps.exif_transpose(source).convert('RGB')
+            image.thumbnail((1600, 1600))
+            output = BytesIO()
+            image.save(output, format='JPEG', quality=82, optimize=True)
+        return ContentFile(output.getvalue(), name='food.jpg')
+    except (OSError, Image.DecompressionBombError):
+        raise forms.ValidationError('This photo could not be read. Choose another image.')
+
+
+class MultiplePhotoInput(forms.FileInput):
+    allow_multiple_selected = True
+
+
+class MultiplePhotoField(forms.Field):
+    widget = MultiplePhotoInput
+
+    def clean(self, value):
+        if not value:
+            return []
+        files = value if isinstance(value, (list, tuple)) else [value]
+        if len(files) > 5:
+            raise forms.ValidationError('A listing can have up to five photos.')
+        return [prepare_listing_photo(forms.ImageField().clean(photo)) for photo in files]
+
 class ListingForm(forms.ModelForm):
     photo = forms.ImageField(required=False, label='Food photo', help_text=f'Upload a clear photo of the actual food. JPG, PNG or WebP, up to {UPLOAD_MAX_MB} MB.', widget=forms.FileInput(attrs={'accept': 'image/jpeg,image/png,image/webp'}))
+    photos = MultiplePhotoField(required=False, label='Listing photos', widget=MultiplePhotoInput(attrs={
+        'id': 'id_photo', 'accept': 'image/jpeg,image/png,image/webp', 'data-max-files': '5', 'data-max-bytes': UPLOAD_MAX_BYTES}))
+    remove_photos = forms.MultipleChoiceField(required=False)
+    cover_photo = forms.CharField(required=False)
     pickup_latitude = forms.DecimalField(required=False, min_value=-90, max_value=90, max_digits=9, decimal_places=6, widget=forms.HiddenInput())
     pickup_longitude = forms.DecimalField(required=False, min_value=-180, max_value=180, max_digits=9, decimal_places=6, widget=forms.HiddenInput())
     def clean_photo(self):
         photo = self.cleaned_data.get('photo')
-        if not photo:
+        if not photo or not self.files.get('photo'):
             return photo
-        if not hasattr(photo, 'temporary_file_path') and photo == self.instance.photo and not self.files:
-            return photo
-        if photo.size > UPLOAD_MAX_BYTES:
-            raise forms.ValidationError(f'Choose a photo smaller than {UPLOAD_MAX_MB} MB.')
-        try:
-            with Image.open(photo) as source:
-                if source.format not in {'JPEG', 'PNG', 'WEBP'}:
-                    raise forms.ValidationError('Use a JPG, PNG or WebP photo.')
-                if source.width * source.height > 25_000_000:
-                    raise forms.ValidationError('Choose a photo smaller than 25 megapixels.')
-                image = ImageOps.exif_transpose(source).convert('RGB')
-                image.thumbnail((1600, 1600))
-                output = BytesIO()
-                image.save(output, format='JPEG', quality=82, optimize=True)
-            return ContentFile(output.getvalue(), name='food.jpg')
-        except (OSError, Image.DecompressionBombError):
-            raise forms.ValidationError('This photo could not be read. Choose another image.')
+        return prepare_listing_photo(photo)
     safety_acknowledged = forms.BooleanField(label='I confirm that the food information is accurate. FoodLoop does not inspect or certify food; I remain responsible for describing it honestly.')
     class Meta:
         model = Listing
@@ -47,6 +69,18 @@ class ListingForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        from django.urls import reverse
+        self.saved_photos = []
+        self._existing_photos = []
+        if self.instance.pk:
+            if self.instance.photo:
+                self._existing_photos.append(('cover', self.instance.photo))
+                self.saved_photos.append({'token': 'cover', 'url': reverse('listing_photo', args=[self.instance.pk]), 'cover': True})
+            for photo in self.instance.extra_photos.all():
+                token = f'extra-{photo.pk}'
+                self._existing_photos.append((token, photo.image))
+                self.saved_photos.append({'token': token, 'url': reverse('listing_extra_photo', args=[self.instance.pk, photo.pk]), 'cover': False})
+        self.fields['remove_photos'].choices = [(photo['token'], f'Photo {index+1}') for index, photo in enumerate(self.saved_photos)]
         prompts = {
             'name': 'e.g. Fresh bread rolls',
             'quantity': 'Enter the quantity available',
@@ -69,6 +103,34 @@ class ListingForm(forms.ModelForm):
             suggested = (now + timedelta(days=1)).replace(hour=12, minute=0, second=0, microsecond=0)
             self.initial['deadline'] = suggested.replace(tzinfo=None)
 
+    def clean_gallery(self, cleaned):
+        additions = cleaned.get('photos', [])
+        removed = set(cleaned.get('remove_photos', []))
+        selected = cleaned.get('cover_photo', '')
+        legacy = bool(self.files.get('photo'))
+        if legacy:
+            if additions or removed or (selected and selected != 'cover'):
+                raise forms.ValidationError('Use the photo gallery controls for this update.')
+            return cleaned
+        retained = [(token, photo) for token, photo in self._existing_photos if token not in removed]
+        self._gallery_items = retained + [(f'new-{index}', photo) for index, photo in enumerate(additions)]
+        if len(self._gallery_items) > 5:
+            self.add_error('photos', 'A listing can have up to five photos. Remove a saved photo before adding more.')
+        allowed = {token for token, _ in self._gallery_items}
+        if selected and selected not in allowed and selected not in removed:
+            self.add_error('cover_photo', 'Choose a cover photo from this listing.')
+        self._gallery_cover = selected if selected in allowed else next(iter(self._gallery_items), ('', None))[0]
+        self._gallery_changed = bool(additions or removed or (selected and selected != 'cover'))
+        return cleaned
+
+    def save_photos(self, listing):
+        from .listing_photos import save_gallery, schedule_photo_cleanup
+        previous = [photo.name for _, photo in self._existing_photos]
+        if self.files.get('photo'):
+            schedule_photo_cleanup(listing.photo.storage, set(previous) - {listing.photo.name} - set(listing.extra_photos.values_list('image', flat=True)))
+        elif self._gallery_changed:
+            save_gallery(listing, self._gallery_items, self._gallery_cover, previous)
+
     def save(self, commit=True):
         listing = super().save(commit=False)
         report_fields = {'access_surface', 'access_condition', 'access_notes'}
@@ -77,6 +139,7 @@ class ListingForm(forms.ModelForm):
         if commit:
             listing.save()
             self.save_m2m()
+            self.save_photos(listing)
         return listing
 
     def clean_deadline(self):
@@ -91,7 +154,7 @@ class ListingForm(forms.ModelForm):
         longitude = cleaned.get('pickup_longitude')
         if (latitude is None) != (longitude is None):
             self.add_error(None, 'Capture both pickup coordinates together, or clear the pin and use the area instead.')
-        return cleaned
+        return self.clean_gallery(cleaned)
 
 class RequestForm(forms.Form):
     quantity = forms.DecimalField(min_value=0.01, max_digits=10, decimal_places=2)

@@ -93,13 +93,15 @@ class AcceptanceTests(TestCase):
         self.assertContains(self.client.get('/?availability=withdrawn'), 'Bread')
         self.assertNotContains(self.client.get('/?availability=available'), '>Bread<')
 
-    def test_tc11_deadline_ranking_and_visible_reasons(self):
+    def test_tc11_deadline_ranking_and_compact_cards(self):
         urgent = Listing.objects.create(provider=self.provider.membership.organisation, name='Urgent bread', quantity=10, pathway='human', condition='fresh', area='Lusaka', address='Secret', deadline=timezone.now()+timedelta(hours=1), safety_acknowledged=True)
         self.client.force_login(self.recipient)
         response = self.client.get('/')
         self.assertEqual(response.context['listings'][0].pk, urgent.pk)
-        self.assertContains(response, '% match')
-        self.assertContains(response, 'Same area')
+        self.assertIn('Same area', response.context['listings'][0].match_reason)
+        self.assertContains(response, 'Urgent bread')
+        self.assertContains(response, 'card-deadline is-urgent')
+        self.assertNotContains(response, '% match')
 
     def test_tc12_and_tc19_request_quantity_and_acknowledgement(self):
         self.client.force_login(self.recipient)

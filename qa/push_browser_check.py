@@ -51,15 +51,14 @@ with TemporaryDirectory(prefix='foodloop-push-browser-') as temp:
         page.route('https://foodloop.test/**',handle)
         page.goto('https://foodloop.test/notifications/')
         page.locator('#push-enable').click()
-        page.wait_for_function("document.querySelector('#push-test').disabled === false")
-        page.locator('#push-test').click()
-        page.wait_for_function("document.querySelector('#push-status').textContent.includes('Test alert requested')")
-        assert '/notifications/push/subscribe/' in requests and '/notifications/push/test/' in requests
+        page.wait_for_function("document.querySelector('#push-status').textContent.includes('enabled')")
+        assert page.locator('#push-test').count() == 0
+        assert '/notifications/push/subscribe/' in requests and '/notifications/push/test/' not in requests
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
         page.screenshot(path=str(ROOT/'qa/phone-notification-controls.png'),full_page=True)
         page.locator('#push-enable').click()
-        page.wait_for_function("document.querySelector('#push-test').disabled === true")
+        page.wait_for_function("document.querySelector('#push-status').textContent.includes('turned off')")
         assert '/notifications/push/unsubscribe/' in requests
         assert not errors,errors
         browser.close()
-        print('390px phone alerts: visible controls, enable, subscribe, test, disable and layout PASS; browser push APIs simulated.')
+        print('390px phone alerts: enable, subscribe and disable work without a test-alert button; layout PASS; browser APIs simulated.')

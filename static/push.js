@@ -2,7 +2,6 @@
   const button = document.querySelector('#push-enable');
   if (!button) return;
   const status = document.querySelector('#push-status');
-  const test = document.querySelector('#push-test');
   const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
   const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
   const decode = value => {
@@ -21,7 +20,6 @@
   ]);
   const enabled = value => {
     button.textContent = value ? 'Turn off phone notifications' : 'Enable phone notifications';
-    if (test) test.disabled = !value;
   };
   if (!supported) {
     button.disabled = true;
@@ -44,7 +42,7 @@
         subscription = await registration.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:decode(button.dataset.publicKey)});
         await send(button.dataset.subscribeUrl, subscription.toJSON());
         enabled(true);
-        status.textContent = 'Phone notifications are enabled. Send a test alert to check your phone notification tray.';
+        status.textContent = 'Phone notifications are enabled. New account and collection updates will appear in your phone notification tray.';
       }
     } catch (error) { status.textContent = error.message || 'Could not update notification settings.'; }
     finally { button.disabled = false; }
@@ -56,12 +54,4 @@
       status.textContent = 'Phone notifications are enabled on this device.';
     }
   }).catch(error => { status.textContent = error.message; });
-  test?.addEventListener('click', async () => {
-    test.disabled = true;
-    try {
-      await send(test.dataset.url, {});
-      status.textContent = 'Test alert requested. Check your phone notification tray and notification permissions.';
-    } catch (error) { status.textContent = error.message; }
-    finally { test.disabled = false; }
-  });
 })();

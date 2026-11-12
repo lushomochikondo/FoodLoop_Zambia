@@ -181,7 +181,9 @@ def workspace_context(request):
     elif availability == 'allocated': listings = listings.filter(status='available', deadline__gt=timezone.now(), allocated__gte=F('quantity'))
     elif availability in ['withdrawn', 'removed']: listings = listings.filter(status=availability)
     cards = list(listings.order_by('deadline'))
+    deadline_check = timezone.now()
     for listing in cards:
+        listing.deadline_soon = listing.deadline <= deadline_check + timedelta(hours=6)
         same = org and org.area.casefold() == listing.area.casefold()
         listing.match_reason = ('Same area · ' if same else '') + 'Collect by ' + timezone.localtime(listing.deadline).strftime('%d %b, %H:%M CAT')
     if org and org.role != 'provider':
@@ -362,10 +364,12 @@ def create_listing(request):
     if org.role != 'provider' or org.status != 'approved': raise PermissionDenied
     form = ListingForm(request.POST or None, request.FILES or None)
     if request.method == 'POST' and form.is_valid():
-        listing = form.save(commit=False)
-        listing.provider = org
-        listing.save()
-        reoffer_listing(listing, 'New listing published.')
+        with transaction.atomic():
+            listing = form.save(commit=False)
+            listing.provider = org
+            listing.save()
+            form.save_photos(listing)
+            reoffer_listing(listing, 'New listing published.')
         messages.success(request, 'Listing published and available to eligible organisations.')
         return redirect('detail', pk=listing.pk)
     return render(request, 'form.html', {'form': form})
@@ -654,6 +658,20 @@ def listing_photo(request, pk):
     if not listing.photo: return HttpResponseNotFound('No photo has been added.')
     try: photo = listing.photo.open('rb')
     except (OSError, FileNotFoundError): return HttpResponseNotFound('This photo is unavailable.')
+    response = FileResponse(photo, content_type='image/jpeg', filename='food.jpg')
+    response['Cache-Control'] = 'private, no-store'
+    response['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+
+@login_required
+def listing_extra_photo(request, pk, photo_pk):
+    listing = get_object_or_404(visible(request.user), pk=pk)
+    image = get_object_or_404(listing.extra_photos, pk=photo_pk)
+    try:
+        photo = image.image.open('rb')
+    except (OSError, FileNotFoundError):
+        return HttpResponseNotFound('This photo is unavailable.')
     response = FileResponse(photo, content_type='image/jpeg', filename='food.jpg')
     response['Cache-Control'] = 'private, no-store'
     response['X-Content-Type-Options'] = 'nosniff'

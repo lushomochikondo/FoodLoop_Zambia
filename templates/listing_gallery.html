@@ -1,0 +1,15 @@
+{% load static %}
+<section class="listing-gallery" aria-label="Listing photos" data-gallery>
+  <div class="detail-photo">
+    {% if listing.photo %}<img data-gallery-main src="{% url 'listing_photo' listing.pk %}" alt="{{ listing.name }}">{% else %}<div class="no-photo"><svg aria-hidden="true"><use href="#i-box"/></svg><span>The donor hasn't added a photo yet.</span></div>{% endif %}
+    <span class="photo-pathway {{ listing.pathway }}">{{ listing.get_pathway_display }}</span>
+  </div>
+  {% with photos=listing.extra_photos.all %}{% if listing.photo and photos %}
+  <div class="gallery-thumbnails" role="group" aria-label="Choose a listing photo">
+    <button type="button" class="gallery-thumb" data-gallery-src="{% url 'listing_photo' listing.pk %}" aria-label="Show photo 1" aria-pressed="true"><img src="{% url 'listing_photo' listing.pk %}" alt=""></button>
+    {% for photo in photos %}<button type="button" class="gallery-thumb" data-gallery-src="{% url 'listing_extra_photo' listing.pk photo.pk %}" aria-label="Show photo {{ forloop.counter|add:'1' }}" aria-pressed="false"><img src="{% url 'listing_extra_photo' listing.pk photo.pk %}" alt="" loading="lazy"></button>{% endfor %}
+  </div>
+  <p class="gallery-position" data-gallery-position aria-live="polite">Photo 1 of {{ photos|length|add:'1' }}</p>
+  {% endif %}{% endwith %}
+</section>
+<script src="{% static 'listing-gallery.js' %}" defer></script>

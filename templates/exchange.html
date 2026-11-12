@@ -1,4 +1,4 @@
-{% extends 'base.html' %}{% load static %}{% block title %}Food exchange · FoodLoop Zambia</div>
+{% extends 'base.html' %}{% load static %}{% block title %}Food exchange · FoodLoop Zambia
 {% endblock %}{% block content %}
 <div class="exchange-page" data-stock-feed data-stock-endpoint="{% url 'listing_stock' %}" data-stock-donor="{% if org.role == 'provider' or user.is_staff %}1{% else %}0{% endif %}"><p class="stock-update" data-stock-message role="status" aria-live="polite" hidden></p>
 <section class="exchange-intro" aria-label="Welcome">

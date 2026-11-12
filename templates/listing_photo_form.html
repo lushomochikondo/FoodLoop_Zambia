@@ -1,0 +1,19 @@
+<section class="editor-section" data-photo-editor>
+  <div class="section-number">01</div><h2>Listing photos</h2>
+  <p class="muted">Add up to five photos of the actual food. Your cover photo appears on the card; the others appear when someone opens the listing. JPG, PNG or WebP, up to 4 MB each.</p>
+  {% if form.saved_photos %}<div class="saved-photo-grid">
+    {% for photo in form.saved_photos %}<div class="saved-photo-item" data-saved-photo>
+      <img src="{{ photo.url }}" alt="Saved listing photo {{ forloop.counter }}">
+      <label><input type="radio" name="cover_photo" value="{{ photo.token }}" {% if photo.cover %}checked{% endif %}> Cover</label>
+      <label><input type="checkbox" name="remove_photos" value="{{ photo.token }}" data-remove-photo> Remove</label>
+    </div>{% endfor %}
+  </div>{% endif %}
+  <div class="upload-zone" id="upload-zone">
+    <div class="upload-placeholder" id="upload-placeholder"><strong>Choose listing photos</strong><span>Select up to five photos. The first is the default cover.</span></div>
+    <img id="photo-preview" alt="First selected listing photo" hidden>
+    <label for="id_photo">Add photos</label>{{ form.photos }}
+    <p id="photo-filename" role="status" aria-live="polite"></p>
+  </div>
+  <div id="new-photo-previews" class="new-photo-grid" aria-label="Selected photos"></div>
+  {{ form.photos.errors }}{{ form.photo.errors }}{{ form.remove_photos.errors }}{{ form.cover_photo.errors }}
+</section>

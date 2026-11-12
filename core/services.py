@@ -263,8 +263,11 @@ def delete_listing(user, pk):
     else:
         photo_name = listing.photo.name
         storage = listing.photo.storage
+        extra_names = list(listing.extra_photos.values_list('image', flat=True))
         listing.delete()
         if photo_name: transaction.on_commit(lambda: storage.delete(photo_name),robust=True)
+        from .listing_photos import schedule_photo_cleanup
+        schedule_photo_cleanup(storage, extra_names)
     AuditLog.objects.create(actor=user, action=f'Listing {original_pk}: deleted by donor; history retained: {retained}. {name}'[:240])
     return retained
 

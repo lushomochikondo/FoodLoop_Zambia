@@ -45,6 +45,7 @@ urlpatterns += [
     path('impact/statement/', views.impact_statement, name='impact_statement'),
     path('profile/', views.profile, name='profile'),
     path('listings/<int:pk>/photo/', views.listing_photo, name='listing_photo'),
+    path('listings/<int:pk>/photos/<int:photo_pk>/', views.listing_extra_photo, name='listing_extra_photo'),
     path('about/terms/', TemplateView.as_view(template_name='terms.html'), name='terms'),
     path('about/privacy/', TemplateView.as_view(template_name='privacy.html'), name='privacy'),
     path('service-worker.js', never_cache(lambda request: FileResponse(open(settings.BASE_DIR / 'static' / 'service-worker.js', 'rb'), content_type='application/javascript')), name='service_worker'),

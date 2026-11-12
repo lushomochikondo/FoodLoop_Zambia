@@ -341,6 +341,17 @@ class PushDelivery(models.Model):
         constraints = [models.UniqueConstraint(fields=['notification','subscription'], name='push_delivery_once')]
 
 
+class ListingPhoto(models.Model):
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='extra_photos')
+    image = models.ImageField(upload_to='listings/%Y/%m/')
+    position = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ['position', 'pk']
+        constraints = [models.UniqueConstraint(fields=['listing', 'position'], name='listing_photo_position'),
+                       models.CheckConstraint(condition=models.Q(position__lt=4), name='four_extra_listing_photos')]
+
+
 class ScheduledJobState(models.Model):
     name = models.CharField(max_length=80, unique=True)
     claim_token = models.CharField(max_length=32, blank=True, default='')

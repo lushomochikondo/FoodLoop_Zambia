@@ -11,7 +11,7 @@
   <h2>Phone notifications</h2>
   <p>{% if push_ready %}Phone notification service configured.{% else %}Phone notification service needs setup.{% endif %} {{ phone_count }} registered device{{ phone_count|pluralize }}.</p>
   <p>{{ push_sent_count }} alert{{ push_sent_count|pluralize }} accepted by the push service in the last 24 hours.</p>
-  <p>Android test: open FoodLoop in Chrome, sign in, open Notifications and choose Enable phone notifications. Allow the permission, choose Send test phone alert, then check the phone notification tray. Check Android notification settings for Chrome or the installed FoodLoop app if no alert appears.</p>
+  <p>On Android, open FoodLoop in Chrome, sign in, open Notifications and choose Enable phone notifications. Allow the permission to receive account and collection updates in the phone notification tray. Check Android notification settings for Chrome or the installed FoodLoop app if alerts do not appear.</p>
 </section>
 <section class="report-panel">
   <h2>Automatic retries</h2>

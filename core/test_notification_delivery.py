@@ -17,7 +17,7 @@ class NotificationDeliveryTests(TestCase):
     def test_notification_page_exposes_phone_controls(self):
         response = self.client.get('/notifications/')
         self.assertContains(response, 'Enable phone notifications')
-        self.assertContains(response, 'Send test phone alert')
+        self.assertNotContains(response, 'Send test phone alert')
         self.assertContains(response, 'test-public-key')
 
     @override_settings(EMAIL_NOTIFICATIONS_ENABLED=True, EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend', WEB_PUSH_ENABLED=False)
