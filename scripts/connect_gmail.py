@@ -6,6 +6,7 @@ import hmac
 import json
 import secrets
 import time
+import webbrowser
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
@@ -18,6 +19,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--client-file', type=Path, required=True)
     parser.add_argument('--sender', required=True, help='The Gmail address you will authorize.')
+    parser.add_argument('--open-browser', action='store_true', help='Open Google consent in your default browser.')
     args = parser.parse_args()
     client = json.loads(args.client_file.read_text(encoding='utf-8')).get('installed')
     if not client or not client.get('client_id') or not client.get('client_secret'):
@@ -61,6 +63,8 @@ def main():
             'login_hint': args.sender})
         print('Open this Google authorization link in your browser (valid for 10 minutes):', flush=True)
         print(url, flush=True)
+        if args.open_browser:
+            webbrowser.open(url)
         deadline = time.monotonic() + 600
         while not result and time.monotonic() < deadline:
             server.handle_request()
